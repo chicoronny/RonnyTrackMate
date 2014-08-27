@@ -45,6 +45,14 @@
     <groupId>sc.fiji</groupId>
     <artifactId>fiji-lib</artifactId>
   </dependency>
+  <dependency>
+  	<groupId>org.scijava</groupId>
+  	<artifactId>scijava-common</artifactId>
+  </dependency>
+  <dependency>
+  	<groupId>org.jdom</groupId>
+  	<artifactId>jdom2</artifactId>
+  </dependency>
   </dependencies>
 </project>
 
