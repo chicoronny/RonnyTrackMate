@@ -2,14 +2,14 @@ package net.chicoronny.trackmate.lineartracker;
 
 import static fiji.plugin.trackmate.io.IOUtils.readDoubleAttribute;
 import static fiji.plugin.trackmate.io.IOUtils.writeAttribute;
-import static net.chicoronny.trackmate.lineartracker.linearTrackerKeys.DEFAULT_INITIAL_DISTANCE;
-import static net.chicoronny.trackmate.lineartracker.linearTrackerKeys.DEFAULT_MAX_COST;
-import static net.chicoronny.trackmate.lineartracker.linearTrackerKeys.DEFAULT_STICK_RADIUS;
-import static net.chicoronny.trackmate.lineartracker.linearTrackerKeys.DEFAULT_SUCCEEDING_DISTANCE;
-import static net.chicoronny.trackmate.lineartracker.linearTrackerKeys.KEY_INITIAL_DISTANCE;
-import static net.chicoronny.trackmate.lineartracker.linearTrackerKeys.KEY_MAX_COST;
-import static net.chicoronny.trackmate.lineartracker.linearTrackerKeys.KEY_STICK_RADIUS;
-import static net.chicoronny.trackmate.lineartracker.linearTrackerKeys.KEY_SUCCEEDING_DISTANCE;
+import static net.chicoronny.trackmate.lineartracker.LinearTrackerKeys.DEFAULT_INITIAL_DISTANCE;
+import static net.chicoronny.trackmate.lineartracker.LinearTrackerKeys.DEFAULT_MAX_COST;
+import static net.chicoronny.trackmate.lineartracker.LinearTrackerKeys.DEFAULT_STICK_RADIUS;
+import static net.chicoronny.trackmate.lineartracker.LinearTrackerKeys.DEFAULT_SUCCEEDING_DISTANCE;
+import static net.chicoronny.trackmate.lineartracker.LinearTrackerKeys.KEY_INITIAL_DISTANCE;
+import static net.chicoronny.trackmate.lineartracker.LinearTrackerKeys.KEY_MAX_COST;
+import static net.chicoronny.trackmate.lineartracker.LinearTrackerKeys.KEY_STICK_RADIUS;
+import static net.chicoronny.trackmate.lineartracker.LinearTrackerKeys.KEY_SUCCEEDING_DISTANCE;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,6 +22,7 @@ import org.scijava.plugin.Plugin;
 import fiji.plugin.trackmate.Model;
 import fiji.plugin.trackmate.SpotCollection;
 import fiji.plugin.trackmate.gui.ConfigurationPanel;
+import fiji.plugin.trackmate.providers.TrackerProvider;
 import fiji.plugin.trackmate.tracking.SpotTracker;
 import fiji.plugin.trackmate.tracking.SpotTrackerFactory;
 
@@ -29,7 +30,7 @@ import fiji.plugin.trackmate.tracking.SpotTrackerFactory;
  * A factory for creating LinearTracker objects.
  */
 @Plugin(type = SpotTrackerFactory.class)
-public class linearTrackerFactory implements SpotTrackerFactory {
+public class LinearTrackerFactory implements SpotTrackerFactory {
 
     /** The Constant TRACKER_KEY. */
     public static final String TRACKER_KEY = "LINEAR_TRACKER";
@@ -92,7 +93,7 @@ public class linearTrackerFactory implements SpotTrackerFactory {
     @Override
     public ConfigurationPanel getTrackerConfigurationPanel(final Model model) {
 	final String spaceUnits = model.getSpaceUnits();
-	return new linearTrackerSettingsPanel(NAME, INFO_TEXT, spaceUnits);
+	return new LinearTrackerSettingsPanel(NAME, INFO_TEXT, spaceUnits);
     }
 
     /* (non-Javadoc)
@@ -183,5 +184,11 @@ public class linearTrackerFactory implements SpotTrackerFactory {
     public String getErrorMessage() {
 	return errorMessage;
     }
+
+	public static void main( final String[] args )
+	{
+		final TrackerProvider provider = new TrackerProvider();
+		System.out.println( provider.echo() );// DEBUG
+	}
 
 }

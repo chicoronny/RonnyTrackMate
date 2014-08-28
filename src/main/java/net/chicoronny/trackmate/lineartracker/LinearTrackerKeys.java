@@ -1,6 +1,6 @@
 package net.chicoronny.trackmate.lineartracker;
 
-public class linearTrackerKeys {
+public class LinearTrackerKeys {
     
     /** The Constant XML_ATTRIBUTE_TRACKER_NAME. */
     public static final String XML_ATTRIBUTE_TRACKER_NAME = "TRACKER_NAME";

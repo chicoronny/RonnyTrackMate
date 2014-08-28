@@ -3,10 +3,10 @@ package net.chicoronny.trackmate.lineartracker;
 import static fiji.plugin.trackmate.gui.TrackMateWizard.BIG_FONT;
 import static fiji.plugin.trackmate.gui.TrackMateWizard.FONT;
 import static fiji.plugin.trackmate.gui.TrackMateWizard.TEXTFIELD_DIMENSION;
-import static net.chicoronny.trackmate.lineartracker.linearTrackerKeys.KEY_INITIAL_DISTANCE;
-import static net.chicoronny.trackmate.lineartracker.linearTrackerKeys.KEY_MAX_COST;
-import static net.chicoronny.trackmate.lineartracker.linearTrackerKeys.KEY_STICK_RADIUS;
-import static net.chicoronny.trackmate.lineartracker.linearTrackerKeys.KEY_SUCCEEDING_DISTANCE;
+import static net.chicoronny.trackmate.lineartracker.LinearTrackerKeys.KEY_INITIAL_DISTANCE;
+import static net.chicoronny.trackmate.lineartracker.LinearTrackerKeys.KEY_MAX_COST;
+import static net.chicoronny.trackmate.lineartracker.LinearTrackerKeys.KEY_STICK_RADIUS;
+import static net.chicoronny.trackmate.lineartracker.LinearTrackerKeys.KEY_SUCCEEDING_DISTANCE;
 
 import java.awt.Font;
 import java.util.HashMap;
@@ -21,7 +21,7 @@ import fiji.plugin.trackmate.gui.panels.components.JNumericTextField;
 /**
  * The Class linearTrackerSettingsPanel.
  */
-public class linearTrackerSettingsPanel extends ConfigurationPanel {
+public class LinearTrackerSettingsPanel extends ConfigurationPanel {
     
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
@@ -72,7 +72,7 @@ public class linearTrackerSettingsPanel extends ConfigurationPanel {
      * @param spaceUnits
      *            the space units
      */
-    public linearTrackerSettingsPanel(final String name, final String infoText,
+    public LinearTrackerSettingsPanel(final String name, final String infoText,
 	    final String spaceUnits) {
 	this.trackerName = name;
 	this.spaceUnits = spaceUnits;

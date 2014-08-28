@@ -2,10 +2,10 @@ package net.chicoronny.trackmate.lineartracker;
 
 import static fiji.plugin.trackmate.util.TMUtils.checkMapKeys;
 import static fiji.plugin.trackmate.util.TMUtils.checkParameter;
-import static net.chicoronny.trackmate.lineartracker.linearTrackerKeys.KEY_INITIAL_DISTANCE;
-import static net.chicoronny.trackmate.lineartracker.linearTrackerKeys.KEY_MAX_COST;
-import static net.chicoronny.trackmate.lineartracker.linearTrackerKeys.KEY_STICK_RADIUS;
-import static net.chicoronny.trackmate.lineartracker.linearTrackerKeys.KEY_SUCCEEDING_DISTANCE;
+import static net.chicoronny.trackmate.lineartracker.LinearTrackerKeys.KEY_INITIAL_DISTANCE;
+import static net.chicoronny.trackmate.lineartracker.LinearTrackerKeys.KEY_MAX_COST;
+import static net.chicoronny.trackmate.lineartracker.LinearTrackerKeys.KEY_STICK_RADIUS;
+import static net.chicoronny.trackmate.lineartracker.LinearTrackerKeys.KEY_SUCCEEDING_DISTANCE;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -355,5 +355,28 @@ public class LinearTracker implements SpotTracker, Benchmark
     public long getProcessingTime() {
 	return processingTime;
     }
+
+	/**
+	 * Ignored.
+	 */
+	@Override
+	public void setNumThreads()
+	{}
+
+	/**
+	 * Ignored.
+	 */
+	@Override
+	public void setNumThreads( final int numThreads )
+	{}
+
+	/**
+	 * Ignored.
+	 */
+	@Override
+	public int getNumThreads()
+	{
+		return 1;
+	}
 
 }
