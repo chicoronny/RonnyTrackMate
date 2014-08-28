@@ -1,5 +1,12 @@
 package net.chicoronny.trackmate.lineartracker;
 
+import static fiji.plugin.trackmate.util.TMUtils.checkMapKeys;
+import static fiji.plugin.trackmate.util.TMUtils.checkParameter;
+import static net.chicoronny.trackmate.lineartracker.linearTrackerKeys.KEY_INITIAL_DISTANCE;
+import static net.chicoronny.trackmate.lineartracker.linearTrackerKeys.KEY_MAX_COST;
+import static net.chicoronny.trackmate.lineartracker.linearTrackerKeys.KEY_STICK_RADIUS;
+import static net.chicoronny.trackmate.lineartracker.linearTrackerKeys.KEY_SUCCEEDING_DISTANCE;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -20,12 +27,6 @@ import fiji.plugin.trackmate.SpotCollection;
 import fiji.plugin.trackmate.tracking.SpotTracker;
 import fiji.plugin.trackmate.tracking.kdtree.FlagNode;
 import fiji.plugin.trackmate.util.TMUtils;
-import static fiji.plugin.trackmate.util.TMUtils.checkParameter;
-import static fiji.plugin.trackmate.util.TMUtils.checkMapKeys;
-import static fiji.plugin.trackmate.tracking.linear.linearTrackerKeys.KEY_INITIAL_DISTANCE;
-import static fiji.plugin.trackmate.tracking.linear.linearTrackerKeys.KEY_SUCCEEDING_DISTANCE;
-import static fiji.plugin.trackmate.tracking.linear.linearTrackerKeys.KEY_STICK_RADIUS;
-import static fiji.plugin.trackmate.tracking.linear.linearTrackerKeys.KEY_MAX_COST;
 
 
 /**
@@ -45,7 +46,8 @@ import static fiji.plugin.trackmate.tracking.linear.linearTrackerKeys.KEY_MAX_CO
  * 
  * @author Ronny Sczech
  */
-public class LinearTracker implements SpotTracker, Benchmark {
+public class LinearTracker implements SpotTracker, Benchmark
+{
 
     /** The logger. */
     private Logger logger = Logger.VOID_LOGGER;
@@ -54,15 +56,13 @@ public class LinearTracker implements SpotTracker, Benchmark {
     private SimpleWeightedGraph<Spot, DefaultWeightedEdge> graph;
     
     /** The spots. */
-    private SpotCollection spots;
+    private final SpotCollection spots;
     
     /** The settings. */
-    private Map<String, Object> settings;
+    private final Map<String, Object> settings;
     
     /** The error message. */
     private String errorMessage;
-
-    private int numThreads;
 
     private long processingTime;
 
@@ -77,7 +77,6 @@ public class LinearTracker implements SpotTracker, Benchmark {
     public LinearTracker(final SpotCollection spots, final Map<String, Object> settings) {
 	this.spots = spots;
 	this.settings = settings;
-	setNumThreads();
     }
 
     /* (non-Javadoc)
@@ -184,25 +183,25 @@ public class LinearTracker implements SpotTracker, Benchmark {
 	    final FlagNode<Spot> source = iterator.next();
 	    
 	    int curFrame = 1;
-	    List<FlagNode<Spot>> nodeList = new ArrayList<FlagNode<Spot>>();
+	    final List<FlagNode<Spot>> nodeList = new ArrayList<FlagNode<Spot>>();
 	    while (curFrame < nFrames) {
 		final RadiusNeighborFlagSearchOnKDTree bsearch = new RadiusNeighborFlagSearchOnKDTree(treeList.get(curFrame));
 		curFrame++;
 		bsearch.search(source.getValue(), stickR, true);
 		if (bsearch.numNeighbors() > 0){
-		    ArrayList<ValuePair<KDTreeNode<FlagNode<Spot>>, Double>> cur = bsearch.getResults();
+		    final ArrayList<ValuePair<KDTreeNode<FlagNode<Spot>>, Double>> cur = bsearch.getResults();
 		    nodeList.add(cur.get(0).getA().get());
 		}
 	    }
 	    
-	    int  burn = (int) Math.round(nFrames*0.9d);
+	    final int  burn = (int) Math.round(nFrames*0.9d);
 	    if (nodeList.size() > burn){
 		final Iterator<FlagNode<Spot>> ii = nodeList.iterator();
 		FlagNode<Spot> oldNode = source;
 		oldNode.setVisited(true);
 		
 		while (ii.hasNext()){
-		    FlagNode<Spot> loopNode = ii.next();
+		    final FlagNode<Spot> loopNode = ii.next();
 		    loopNode.setVisited(true);
 		    
 		    final Spot begin = oldNode.getValue();
@@ -235,10 +234,10 @@ public class LinearTracker implements SpotTracker, Benchmark {
 		if (rsearch.numNeighbors() < 1)
 		    continue;
 
-		FlagNode<Spot> foundNode = rsearch.getSampler(0).get();
+		final FlagNode<Spot> foundNode = rsearch.getSampler(0).get();
 		// get the cost - we have to use the getSquareDistance function here for compatibility
 		double cost = rsearch.getSquareDistance(0); 
-		double[] searchCoords = new double[3];
+		final double[] searchCoords = new double[3];
 		TMUtils.localize(foundNode.getValue(), searchCoords);
 		double[] preVector = LTUtils.Subtract(searchCoords, sourceCoords);
 		double[] estim = new double[3];
@@ -273,9 +272,9 @@ public class LinearTracker implements SpotTracker, Benchmark {
 			    break;
 		    }
 		    // get first entry in the ordered result list
-		    ValuePair<KDTreeNode<FlagNode<Spot>>, Double> cur = lsearch.getResults().get(0); 
+		    final ValuePair<KDTreeNode<FlagNode<Spot>>, Double> cur = lsearch.getResults().get(0); 
 
-		    FlagNode<Spot> loopNode = cur.getA().get();
+		    final FlagNode<Spot> loopNode = cur.getA().get();
 		    cost = cur.getB();
 
 		    oldNode.setVisited(true);
@@ -324,7 +323,7 @@ public class LinearTracker implements SpotTracker, Benchmark {
      * @see fiji.plugin.trackmate.tracking.SpotTracker#setLogger(fiji.plugin.trackmate.Logger)
      */
     @Override
-    public void setLogger(Logger logger) {
+    public void setLogger(final Logger logger) {
 	this.logger = logger;
     }
 
@@ -337,7 +336,7 @@ public class LinearTracker implements SpotTracker, Benchmark {
      *            the error holder
      * @return true, if successful
      */
-    public static boolean checkInput(Map<String, Object> settings, StringBuilder errorHolder) {
+    public static boolean checkInput(final Map<String, Object> settings, final StringBuilder errorHolder) {
 	boolean ok = true;
 	ok = ok	& checkParameter(settings, KEY_INITIAL_DISTANCE, Double.class,	errorHolder);
 	ok = ok	& checkParameter(settings, KEY_SUCCEEDING_DISTANCE, Double.class, errorHolder);
@@ -350,21 +349,6 @@ public class LinearTracker implements SpotTracker, Benchmark {
 	mandatoryKeys.add(KEY_MAX_COST);
 	ok = ok & checkMapKeys(settings, mandatoryKeys, null, errorHolder);
 	return ok;
-    }
-
-    @Override
-    public int getNumThreads() {
-	return numThreads;
-    }
-
-    @Override
-    public void setNumThreads() {
-	this.numThreads = Runtime.getRuntime().availableProcessors();
-    }
-
-    @Override
-    public void setNumThreads(int numThreads) {
-	this.numThreads = numThreads;
     }
 
     @Override

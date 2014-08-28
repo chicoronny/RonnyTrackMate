@@ -1,5 +1,13 @@
 package net.chicoronny.trackmate.lineartracker;
 
+import static fiji.plugin.trackmate.gui.TrackMateWizard.BIG_FONT;
+import static fiji.plugin.trackmate.gui.TrackMateWizard.FONT;
+import static fiji.plugin.trackmate.gui.TrackMateWizard.TEXTFIELD_DIMENSION;
+import static net.chicoronny.trackmate.lineartracker.linearTrackerKeys.KEY_INITIAL_DISTANCE;
+import static net.chicoronny.trackmate.lineartracker.linearTrackerKeys.KEY_MAX_COST;
+import static net.chicoronny.trackmate.lineartracker.linearTrackerKeys.KEY_STICK_RADIUS;
+import static net.chicoronny.trackmate.lineartracker.linearTrackerKeys.KEY_SUCCEEDING_DISTANCE;
+
 import java.awt.Font;
 import java.util.HashMap;
 import java.util.Map;
@@ -9,13 +17,6 @@ import javax.swing.SwingConstants;
 
 import fiji.plugin.trackmate.gui.ConfigurationPanel;
 import fiji.plugin.trackmate.gui.panels.components.JNumericTextField;
-import static fiji.plugin.trackmate.gui.TrackMateWizard.BIG_FONT;
-import static fiji.plugin.trackmate.gui.TrackMateWizard.FONT;
-import static fiji.plugin.trackmate.gui.TrackMateWizard.TEXTFIELD_DIMENSION;
-import static fiji.plugin.trackmate.tracking.linear.linearTrackerKeys.KEY_INITIAL_DISTANCE;
-import static fiji.plugin.trackmate.tracking.linear.linearTrackerKeys.KEY_SUCCEEDING_DISTANCE;
-import static fiji.plugin.trackmate.tracking.linear.linearTrackerKeys.KEY_STICK_RADIUS;
-import static fiji.plugin.trackmate.tracking.linear.linearTrackerKeys.KEY_MAX_COST;
 
 /**
  * The Class linearTrackerSettingsPanel.
@@ -71,8 +72,8 @@ public class linearTrackerSettingsPanel extends ConfigurationPanel {
      * @param spaceUnits
      *            the space units
      */
-    public linearTrackerSettingsPanel(String name, String infoText,
-	    String spaceUnits) {
+    public linearTrackerSettingsPanel(final String name, final String infoText,
+	    final String spaceUnits) {
 	this.trackerName = name;
 	this.spaceUnits = spaceUnits;
 	this.infoText = infoText;
@@ -86,7 +87,7 @@ public class linearTrackerSettingsPanel extends ConfigurationPanel {
 	this.setPreferredSize(new java.awt.Dimension(300, 500));
 	this.setLayout(null);
 
-	JLabel lblSettingsForTracker = new JLabel("Settings for tracker:");
+	final JLabel lblSettingsForTracker = new JLabel("Settings for tracker:");
 	lblSettingsForTracker.setBounds(10, 11, 280, 20);
 	lblSettingsForTracker.setFont(FONT);
 	add(lblSettingsForTracker);
@@ -105,7 +106,7 @@ public class linearTrackerSettingsPanel extends ConfigurationPanel {
 		.replace("<html>", "<html><p align=\"justify\">"));
 	add(labelTrackerDescription);
 
-	JLabel lblInitDistance = new JLabel("Initial distance: ");
+	final JLabel lblInitDistance = new JLabel("Initial distance: ");
 	lblInitDistance.setFont(FONT);
 	lblInitDistance.setBounds(10, 314, 164, 20);
 	add(lblInitDistance);
@@ -116,7 +117,7 @@ public class linearTrackerSettingsPanel extends ConfigurationPanel {
 	initDistField.setSize(TEXTFIELD_DIMENSION);
 	add(initDistField);
 
-	JLabel lblSuccDistance = new JLabel("Succeeding distance: ");
+	final JLabel lblSuccDistance = new JLabel("Succeeding distance: ");
 	lblSuccDistance.setFont(FONT);
 	lblSuccDistance.setBounds(10, 342, 164, 20);
 	add(lblSuccDistance);
@@ -127,7 +128,7 @@ public class linearTrackerSettingsPanel extends ConfigurationPanel {
 	initSuccField.setSize(TEXTFIELD_DIMENSION);
 	add(initSuccField);
 	
-	JLabel lblStickDistance = new JLabel("Stick radius: ");
+	final JLabel lblStickDistance = new JLabel("Stick radius: ");
 	lblStickDistance.setFont(FONT);
 	lblStickDistance.setBounds(10, 370, 164, 20);
 	add(lblStickDistance);
@@ -138,7 +139,7 @@ public class linearTrackerSettingsPanel extends ConfigurationPanel {
 	initStickField.setSize(TEXTFIELD_DIMENSION);
 	add(initStickField);
 	
-	JLabel lblMaxCost = new JLabel("Maximal Cost: ");
+	final JLabel lblMaxCost = new JLabel("Maximal Cost: ");
 	lblMaxCost.setFont(FONT);
 	lblMaxCost.setBounds(10, 396, 164, 20);
 	add(lblMaxCost);
@@ -169,7 +170,7 @@ public class linearTrackerSettingsPanel extends ConfigurationPanel {
      * @see fiji.plugin.trackmate.gui.ConfigurationPanel#setSettings(java.util.Map)
      */
     @Override
-    public void setSettings(Map<String, Object> settings) {
+    public void setSettings(final Map<String, Object> settings) {
 	initDistField.setText(String.format("%.1f",
 		(Double) settings.get(KEY_INITIAL_DISTANCE)));
 	initSuccField.setText(String.format("%.1f",
@@ -185,7 +186,7 @@ public class linearTrackerSettingsPanel extends ConfigurationPanel {
      */
     @Override
     public Map<String, Object> getSettings() {
-	Map<String, Object> settings = new HashMap<String, Object>();
+	final Map<String, Object> settings = new HashMap<String, Object>();
 	settings.put(KEY_INITIAL_DISTANCE, initDistField.getValue());
 	settings.put(KEY_SUCCEEDING_DISTANCE, initSuccField.getValue());
 	settings.put(KEY_STICK_RADIUS, initStickField.getValue());
