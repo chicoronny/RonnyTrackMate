@@ -295,7 +295,9 @@ public class TrackMateBatchPlugin_ extends SomeDialogDescriptor implements PlugI
 	    logger.log("Processing " + file.getName());
 	    final ImagePlus imp = new ImagePlus(file.getAbsolutePath());
 	    final Settings settings = new Settings();
-	    settings.setFromWithoutROI(imp);
+//	    settings.setFromWithoutROI(imp);
+			imp.killRoi();
+			settings.setFrom( imp );
 
 	    // Detection
 	    final DetectorProvider provider = new DetectorProvider();
