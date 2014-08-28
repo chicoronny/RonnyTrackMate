@@ -36,8 +36,6 @@ import javax.swing.WindowConstants;
 import net.chicoronny.trackmate.action.ExportTracksToSQL;
 import net.chicoronny.trackmate.lineartracker.LTUtils;
 import net.chicoronny.trackmate.lineartracker.LinearTrackerFactory;
-import net.imglib2.type.NativeType;
-import net.imglib2.type.numeric.RealType;
 import net.imglib2.util.ValuePair;
 import fiji.plugin.trackmate.Logger;
 import fiji.plugin.trackmate.Model;
@@ -274,8 +272,6 @@ public class TrackMateBatchPlugin_ extends SomeDialogDescriptor implements PlugI
 	/**
 	 * Process.
 	 * 
-	 * @param <T>
-	 *            the generic type
 	 * @param folder
 	 *            the name of the directory to process
 	 * @throws FileNotFoundException
@@ -283,7 +279,8 @@ public class TrackMateBatchPlugin_ extends SomeDialogDescriptor implements PlugI
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
-	private <T extends RealType<T> & NativeType<T>> void process(final File folder) throws IOException {
+	private void process( final File folder ) throws IOException
+	{
 	// get the directory to work on
 
 	final long start = System.currentTimeMillis();
