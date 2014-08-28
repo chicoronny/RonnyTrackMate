@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
-    http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+		http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
 		<groupId>sc.fiji</groupId>
@@ -12,47 +12,69 @@
 		<relativePath />
 	</parent>
 
-  <artifactId>RonnyTrackMate</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
 
-  <name>plugins/RonnyTrackMate_.jar</name>
-  <description>A Maven project with the bare structure to hold TrackMate modules.</description>
+	<artifactId>RonnyTrackMate</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
 
-  <properties>
-    <!-- Prevent the plugin from being copied to ./plugins/ by default -->
-    <imagej.app.directory>../Fiji.app/</imagej.app.directory>
-  </properties>
+	<name>plugins/RonnyTrackMate_.jar</name>
+	<description>A Maven project with the bare structure to hold TrackMate modules.</description>
 
-  <developers>
-    <developer>
-      <id>chicoronny</id>
-      <name>Ronny Sczech</name>
-      <email>Ronny.Sczech@biotec.tu-dresden.de</email>
-      <roles>
-        <role>architect</role>
-        <role>developer</role>
-      </roles>
-      <timezone>+1</timezone>
-    </developer>
-  </developers>
+	<properties>
+		<!-- Prevent the plugin from being copied to ./plugins/ by default -->
+		<imagej.app.directory>../Fiji.app/</imagej.app.directory>
+	</properties>
 
-  <dependencies>
-    <dependency>
-      <groupId>sc.fiji</groupId>
-      <artifactId>TrackMate_</artifactId>
-    </dependency>
-  <dependency>
-    <groupId>sc.fiji</groupId>
-    <artifactId>fiji-lib</artifactId>
-  </dependency>
-  <dependency>
-  	<groupId>org.scijava</groupId>
-  	<artifactId>scijava-common</artifactId>
-  </dependency>
-  <dependency>
-  	<groupId>org.jdom</groupId>
-  	<artifactId>jdom2</artifactId>
-  </dependency>
-  </dependencies>
+	<developers>
+		<developer>
+			<id>chicoronny</id>
+			<name>Ronny Sczech</name>
+			<email>Ronny.Sczech@biotec.tu-dresden.de</email>
+			<roles>
+				<role>architect</role>
+				<role>developer</role>
+			</roles>
+			<timezone>+1</timezone>
+		</developer>
+	</developers>
+
+	<dependencies>
+		<dependency>
+			<groupId>sc.fiji</groupId>
+			<artifactId>TrackMate_</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>sc.fiji</groupId>
+			<artifactId>fiji-lib</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.scijava</groupId>
+			<artifactId>scijava-common</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.jdom</groupId>
+			<artifactId>jdom2</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>net.imglib2</groupId>
+			<artifactId>imglib2</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>net.imglib2</groupId>
+			<artifactId>imglib2-algorithms</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.jgrapht</groupId>
+			<artifactId>jgrapht</artifactId>
+		</dependency>
+	</dependencies>
+	
+	<repositories>
+		<!-- NB: for project parent -->
+		<repository>
+			<id>imagej.public</id>
+			<url>http://maven.imagej.net/content/groups/public</url>
+		</repository>
+	</repositories>
+	
 </project>
 
