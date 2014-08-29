@@ -99,8 +99,8 @@ public class LinearTrackerTestDrive {
 	System.out.println("Whole tracking done in " + (end - start) + " ms.");
 	System.out.println();
 	
-	final String newName = file.getAbsolutePath().substring(0, file.getAbsolutePath().length()-4) + "_T.db";
-	final File _file = new File(newName);
+	//final String newName = file.getAbsolutePath().substring(0, file.getAbsolutePath().length()-4) + "_T.db";
+	//final File _file = new File(newName);
 	//ExportTracksToSQL.export(trackmate.getModel(), settings, _file);
 	
 	final ExportTracksToSQL ex = new ExportTracksToSQL();

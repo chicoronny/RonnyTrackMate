@@ -26,6 +26,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
@@ -40,6 +42,7 @@ import net.imglib2.util.ValuePair;
 import fiji.plugin.trackmate.Logger;
 import fiji.plugin.trackmate.Model;
 import fiji.plugin.trackmate.Settings;
+import fiji.plugin.trackmate.Spot;
 import fiji.plugin.trackmate.TrackMate;
 import fiji.plugin.trackmate.detection.DogDetectorFactory;
 import fiji.plugin.trackmate.detection.LogDetectorFactory;
@@ -380,60 +383,69 @@ public class TrackMateBatchPlugin_ extends SomeDialogDescriptor implements PlugI
 	    	    return;
 	    }
 	    
-	    // Filter
-	    for (final ValuePair<String, Double> f:spotfilters){
-		final boolean isAbove = f.getB() >= 0; 
-		final FeatureFilter filter = new FeatureFilter(f.getA(), f.getB(), isAbove);
-		settings.getSpotFilters().add(filter);
-	    }
+	 // Analyzer
+	    ClassLoader cl = ClassLoader.getSystemClassLoader();
 	    
-	    for (final ValuePair<String, Double> f:trackfilters){
-		final boolean isAbove = f.getB() >= 0; 
-		final FeatureFilter filter = new FeatureFilter(f.getA(), f.getB(), isAbove);
-		settings.getTrackFilters().add(filter);
-	    }
-	    
-	    // Analyzer
-	    final ClassLoader cl = ClassLoader.getSystemClassLoader();
-	    
-	    for (final String a:SPOTANALYZER){
+	    for (String a:SPOTANALYZER){
 		try {
-		    final Class<?> c = cl.loadClass("fiji.plugin.trackmate.features.spot."+a.trim());
+		    Class<?> c = cl.loadClass("fiji.plugin.trackmate.features.spot."+a.trim());
 		    @SuppressWarnings("rawtypes")
-			final
 		    Class<? extends SpotAnalyzerFactory> ac = c.asSubclass(SpotAnalyzerFactory.class);
 		    settings.addSpotAnalyzerFactory(ac.newInstance());
-				}
-				catch ( final Exception e )
-				{
+		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
 		    logger.log(e.getMessage());
 		    return;
 		}
 	    }
 	    
-	    for (final String a:TRACKANALYZER){
+	    for (String a:TRACKANALYZER){
 		try {
-		    final Class<?> c = cl.loadClass("fiji.plugin.trackmate.features.track."+a.trim());
-		    final Class<? extends TrackAnalyzer> ac = c.asSubclass(TrackAnalyzer.class);
+		    Class<?> c = cl.loadClass("fiji.plugin.trackmate.features.track."+a.trim());
+		    Class<? extends TrackAnalyzer> ac = c.asSubclass(TrackAnalyzer.class);
 		    settings.addTrackAnalyzer(ac.newInstance());
-				}
-				catch ( final Exception e )
-				{
+		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
 		    logger.log(e.getMessage());
 		    return;
 		}
 	    }
 	    
-	    for (final String a:EDGEANALYZER){
+	    for (String a:EDGEANALYZER){
 		try {
-		    final Class<?> c = cl.loadClass("fiji.plugin.trackmate.features.edges."+a.trim());
-		    final Class<? extends EdgeAnalyzer> ac = c.asSubclass(EdgeAnalyzer.class);
+		    Class<?> c = cl.loadClass("fiji.plugin.trackmate.features.edges."+a.trim());
+		    Class<? extends EdgeAnalyzer> ac = c.asSubclass(EdgeAnalyzer.class);
 		    settings.addEdgeAnalyzer(ac.newInstance());
-				}
-				catch ( final Exception e )
-				{
+		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
 		    logger.log(e.getMessage());
 		    return;
+		}
+	    }	    
+
+	    // Filter with check of availability
+	    List<SpotAnalyzerFactory<?>> spotFactories = settings.getSpotAnalyzerFactories();
+	    for (ValuePair<String, Double> f:spotfilters){
+		boolean isAbove = f.getB() >= 0; 
+		final FeatureFilter filter = new FeatureFilter(f.getA(), Math.abs(f.getB()), isAbove);
+		Iterator<SpotAnalyzerFactory<?>> fIt = spotFactories.iterator();
+		while (fIt.hasNext()){
+		    List<String> curAnalyzer = fIt.next().getFeatures();
+		    if (curAnalyzer.contains(f.getA()))
+			settings.getSpotFilters().add(filter);
+		}
+		Collection<String> spotFeatures = Spot.FEATURES;
+		if(spotFeatures.contains(f.getA()))
+		    settings.getSpotFilters().add(filter);
+	    }
+	    
+	    
+	    List<TrackAnalyzer> trackAnalyzers = settings.getTrackAnalyzers();
+	    for (ValuePair<String, Double> f:trackfilters){
+		boolean isAbove = f.getB() >= 0; 
+		final FeatureFilter filter = new FeatureFilter(f.getA(), Math.abs(f.getB()), isAbove);
+		Iterator<TrackAnalyzer> tIt = trackAnalyzers.iterator();
+		while (tIt.hasNext()){
+		    List<String> curFeatures = tIt.next().getFeatures();
+		    if (curFeatures.contains(f.getA()))
+			settings.getTrackFilters().add(filter);
 		}
 	    }
   
