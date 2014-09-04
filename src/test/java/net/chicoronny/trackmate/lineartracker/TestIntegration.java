@@ -11,8 +11,10 @@ public class TestIntegration
 		ImageJ.main( args );
 
 		System.out.println( new TrackerProvider().echo() );
+		
+		final TrackMatePlugIn_ plugin = new TrackMatePlugIn_();
 
-		new TrackMatePlugIn_().run( "samples/FakeTracks.tif" );
+		plugin.run( "samples/FakeTracks.tif" );
 	}
 
 }

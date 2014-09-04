@@ -2,6 +2,8 @@ package fiji.plugin.trackmate.features.track;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,12 +19,10 @@ import fiji.plugin.trackmate.Dimension;
 import fiji.plugin.trackmate.FeatureModel;
 import fiji.plugin.trackmate.Model;
 import fiji.plugin.trackmate.Spot;
-import net.imglib2.algorithm.Benchmark;
-import net.imglib2.algorithm.MultiThreaded;
 import net.imglib2.multithreading.SimpleMultiThreading;
 
 @Plugin( type = TrackAnalyzer.class )
-public class TrackLinkingAnalyzer implements TrackAnalyzer, Benchmark,	MultiThreaded {
+public class TrackLinkingAnalyzer implements TrackAnalyzer {
     
     /*
      * 	FEATURE NAMES
@@ -33,7 +33,9 @@ public class TrackLinkingAnalyzer implements TrackAnalyzer, Benchmark,	MultiThre
     
     public static final String TRACK_LENGTH = "TRACK_LENGTH";
     
-    private static final int numFeatures = 2;
+    public static final String TRACK_ANGLE = "TRACK_ANGLE";
+    
+    private static final int numFeatures = 3;   
     
     public static final List< String > FEATURES = new ArrayList< String >( numFeatures );
     
@@ -52,18 +54,23 @@ public class TrackLinkingAnalyzer implements TrackAnalyzer, Benchmark,	MultiThre
     static{
 	FEATURES.add( TRACK_MEAN_LINK_COST );
 	FEATURES.add( TRACK_LENGTH );
+	FEATURES.add( TRACK_ANGLE);
 	
 	FEATURE_NAMES.put( TRACK_MEAN_LINK_COST, "Mean linking cost");
 	FEATURE_NAMES.put( TRACK_LENGTH, "Track length");
+	FEATURE_NAMES.put( TRACK_ANGLE, "Track angle");
 	
 	FEATURE_SHORT_NAMES.put( TRACK_MEAN_LINK_COST, "Mean linking cost");
 	FEATURE_SHORT_NAMES.put( TRACK_LENGTH, "Track length");
+	FEATURE_SHORT_NAMES.put( TRACK_ANGLE, "Track angle");
 	
 	FEATURE_DIMENSIONS.put( TRACK_MEAN_LINK_COST, Dimension.NONE);
-	FEATURE_DIMENSIONS.put( TRACK_LENGTH, Dimension.NONE);
+	FEATURE_DIMENSIONS.put( TRACK_LENGTH, Dimension.LENGTH);
+	FEATURE_DIMENSIONS.put( TRACK_ANGLE, Dimension.NONE);
 	
 	IS_INT.put( TRACK_MEAN_LINK_COST, Boolean.FALSE );
 	IS_INT.put( TRACK_LENGTH, Boolean.FALSE );
+	IS_INT.put( TRACK_ANGLE, Boolean.FALSE );
     }
 
     public TrackLinkingAnalyzer() {
@@ -127,12 +134,12 @@ public class TrackLinkingAnalyzer implements TrackAnalyzer, Benchmark,	MultiThre
 
     @Override
     public void setNumThreads() {
-	this.numThreads = Runtime.getRuntime().availableProcessors();
+    	this.numThreads = Runtime.getRuntime().availableProcessors();
     }
 
     @Override
     public void setNumThreads(int numThreads) {
-	this.numThreads = numThreads;
+    	this.numThreads = numThreads;
     }
 
     @Override
@@ -160,7 +167,7 @@ public class TrackLinkingAnalyzer implements TrackAnalyzer, Benchmark,	MultiThre
 			double mean = 0;
 			double sum = 0;
 			double length = 0;
-			
+									
 			for ( final DefaultWeightedEdge edge : track )
 			{
 			    final Spot source = model.getTrackModel().getEdgeSource( edge );
@@ -173,6 +180,22 @@ public class TrackLinkingAnalyzer implements TrackAnalyzer, Benchmark,	MultiThre
 			
 			fm.putTrackFeature( trackID, TRACK_MEAN_LINK_COST, mean );
 			fm.putTrackFeature( trackID, TRACK_LENGTH, length );
+			
+			final Set< Spot > spots = model.getTrackModel().trackSpots( trackID );
+			final Comparator< Spot > comparator = Spot.frameComparator;
+			final List< Spot > sorted = new ArrayList< Spot >( spots );
+	        Collections.sort( sorted, comparator );
+	        
+	        final Spot first = sorted.get( 0 );
+	        final Spot last = sorted.get( sorted.size() - 1 );
+	        final double x1 = first.getDoublePosition( 0 );
+	        final double y1 = first.getDoublePosition( 1 );
+	        final double x2 = last.getDoublePosition( 0 );
+	        final double y2 = last.getDoublePosition( 1 );
+	        
+	        final double angle = Math.atan2( y2 - y1, x2 - x1 );
+	        
+	        fm.putTrackFeature( trackID, TRACK_ANGLE, angle );
 		    }
 		}
 	    };

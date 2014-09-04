@@ -66,6 +66,8 @@ public class LinearTracker implements SpotTracker, Benchmark
 
     private long processingTime;
 
+	private int numThreads;
+
     /**
      * Instantiates a new tracker.
      * 
@@ -262,14 +264,14 @@ public class LinearTracker implements SpotTracker, Benchmark
 		    lsearch.search(estimSpot, succR, oldCoords, maxCost, true); // use succeeding radius for searching spot in next frame
 		    
 		    if (lsearch.numNeighbors() < 1) {
-			if (firstRun) {  // automatic gap handling -- just one frame
-			    firstRun = false;
-			    //estim = LTUtils.Add(estim, preVector);
-			    succFrame++;
-			    count++;
-			    continue;
-			} else
-			    break;
+				if (firstRun) {  // automatic gap handling -- just one frame
+				    firstRun = false;
+				    //estim = LTUtils.Add(estim, preVector);
+				    succFrame++;
+				    count++;
+				    continue;
+				}
+				break;
 		    }
 		    // get first entry in the ordered result list
 		    final ValuePair<KDTreeNode<FlagNode<Spot>>, Double> cur = lsearch.getResults().get(0); 
@@ -361,14 +363,18 @@ public class LinearTracker implements SpotTracker, Benchmark
 	 */
 	@Override
 	public void setNumThreads()
-	{}
+	{
+		this.numThreads = Runtime.getRuntime().availableProcessors();
+	}
 
 	/**
 	 * Ignored.
 	 */
 	@Override
 	public void setNumThreads( final int numThreads )
-	{}
+	{
+		this.numThreads = numThreads;
+	}
 
 	/**
 	 * Ignored.
@@ -376,7 +382,7 @@ public class LinearTracker implements SpotTracker, Benchmark
 	@Override
 	public int getNumThreads()
 	{
-		return 1;
+		return numThreads;
 	}
 
 }

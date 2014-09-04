@@ -99,9 +99,8 @@ public class LTUtils {
 	final Double diameter = spot.getFeature(SpotRadiusEstimatorFactory.ESTIMATED_DIAMETER);
 	if (null == diameter || diameter == 0) {
 	    return spot;
-	} else {
-	    spot.putFeature(Spot.RADIUS, diameter / 2);
 	}
+	spot.putFeature(Spot.RADIUS, diameter / 2);
 	return spot;
     }
     

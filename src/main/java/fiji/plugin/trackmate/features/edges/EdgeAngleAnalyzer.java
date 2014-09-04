@@ -24,6 +24,7 @@ public class EdgeAngleAnalyzer implements EdgeAnalyzer {
     private static final String EDGE_ANGLE = "EDGE_ANGLE";
     private String INFO_TEXT = "angle between adjacent spots and the x-axis";
     private long processingTime;
+	private int numThreads;
     private static final List< String > FEATURES = new ArrayList< String >( 1 );
     private static final Map< String, Boolean > IS_INT = new HashMap< String, Boolean >( 1 );
     public static final Map< String, String > FEATURE_NAMES = new HashMap< String, String >( 1 );
@@ -95,17 +96,17 @@ public class EdgeAngleAnalyzer implements EdgeAnalyzer {
 
     @Override
     public int getNumThreads() {
-	return 1;
+    return numThreads;
     }
 
     @Override
     public void setNumThreads() {
-
+    this.numThreads = Runtime.getRuntime().availableProcessors();
     }
 
     @Override
-    public void setNumThreads(int arg0) {
-
+    public void setNumThreads(int numThreads) {
+    this.numThreads = numThreads;
     }
 
     @Override

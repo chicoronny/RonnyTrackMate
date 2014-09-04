@@ -392,9 +392,13 @@ public class TrackMateBatchPlugin_ extends SomeDialogDescriptor implements PlugI
 		    @SuppressWarnings("rawtypes")
 		    Class<? extends SpotAnalyzerFactory> ac = c.asSubclass(SpotAnalyzerFactory.class);
 		    settings.addSpotAnalyzerFactory(ac.newInstance());
-		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+		} catch (ClassNotFoundException e) {
 		    logger.log(e.getMessage());
 		    return;
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
 		}
 	    }
 	    
@@ -403,9 +407,13 @@ public class TrackMateBatchPlugin_ extends SomeDialogDescriptor implements PlugI
 		    Class<?> c = cl.loadClass("fiji.plugin.trackmate.features.track."+a.trim());
 		    Class<? extends TrackAnalyzer> ac = c.asSubclass(TrackAnalyzer.class);
 		    settings.addTrackAnalyzer(ac.newInstance());
-		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+		} catch (ClassNotFoundException e) {
 		    logger.log(e.getMessage());
 		    return;
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
 		}
 	    }
 	    
@@ -414,9 +422,13 @@ public class TrackMateBatchPlugin_ extends SomeDialogDescriptor implements PlugI
 		    Class<?> c = cl.loadClass("fiji.plugin.trackmate.features.edges."+a.trim());
 		    Class<? extends EdgeAnalyzer> ac = c.asSubclass(EdgeAnalyzer.class);
 		    settings.addEdgeAnalyzer(ac.newInstance());
-		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+		} catch (ClassNotFoundException e) {
 		    logger.log(e.getMessage());
 		    return;
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
 		}
 	    }	    
 
