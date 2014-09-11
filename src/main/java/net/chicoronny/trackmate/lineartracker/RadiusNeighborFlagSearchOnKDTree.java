@@ -70,19 +70,21 @@ public class RadiusNeighborFlagSearchOnKDTree implements
 	    final double squRadius, float spotRadius, double[] oldCoords, double maxCost) {
 	// consider the current node
 	final double squDistance = current.squDistanceTo(pos);
-	final Spot currentSpot = current.get().getValue();
 	boolean visited = current.get().isVisited();
+	final Spot currentSpot = current.get().getValue();
 	// get coordinates of current position
 	final double[] currentPos = new double[3];
 	TMUtils.localize(currentSpot, currentPos);
-	// calculate reference vector from estimated search position to the old found position from the frame before
-	double[] longVector = LTUtils.Subtract(pos, oldCoords); 
-
+	
 	if (squDistance <= squRadius && !visited) {
+		
+		// calculate reference vector from estimated search position to the old found position from the frame before
+		double[] longVector = LTUtils.Subtract(pos, oldCoords); 
+	
 	    // same factor as in LAP tracker
 	    final double spotRadiusDiff = 1 + Math.abs(currentSpot.getFeature(Spot.RADIUS).floatValue() - spotRadius) * 1.5d; 
 	    // include angle into cost function with calculation of actual vector from the current position to the old found position
-	    final double angle = LTUtils.angleFromVectors(longVector, LTUtils.Subtract(currentPos, oldCoords)); 
+	    final double angle = LTUtils.angleFromVectors(longVector, LTUtils.Subtract(currentPos, oldCoords)) / 2; 
 	    // set score
 	    final double cost = squDistance + spotRadiusDiff * spotRadiusDiff  + angle;
 	    // set maximal cost

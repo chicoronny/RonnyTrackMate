@@ -184,18 +184,19 @@ public class TrackLinkingAnalyzer implements TrackAnalyzer {
 			final Set< Spot > spots = model.getTrackModel().trackSpots( trackID );
 			final Comparator< Spot > comparator = Spot.frameComparator;
 			final List< Spot > sorted = new ArrayList< Spot >( spots );
-	        Collections.sort( sorted, comparator );
-	        
-	        final Spot first = sorted.get( 0 );
-	        final Spot last = sorted.get( sorted.size() - 1 );
-	        final double x1 = first.getDoublePosition( 0 );
-	        final double y1 = first.getDoublePosition( 1 );
-	        final double x2 = last.getDoublePosition( 0 );
-	        final double y2 = last.getDoublePosition( 1 );
-	        
-	        final double angle = Math.atan2( y2 - y1, x2 - x1 );
-	        
-	        fm.putTrackFeature( trackID, TRACK_ANGLE, angle );
+			Collections.sort( sorted, comparator );
+    	        
+        	        final Spot first = sorted.get( 0 );
+        	        final Spot last = sorted.get( sorted.size() - 1 );
+        	        final double x1 = first.getDoublePosition( 0 );
+        	        final double y1 = first.getDoublePosition( 1 );
+        	        final double x2 = last.getDoublePosition( 0 );
+        	        final double y2 = last.getDoublePosition( 1 );
+        	        
+        	        final double angle = Math.atan2( y2 - y1, x2 - x1 );
+        	        
+        	        fm.putTrackFeature( trackID, TRACK_ANGLE, angle );
+        	        
 		    }
 		}
 	    };

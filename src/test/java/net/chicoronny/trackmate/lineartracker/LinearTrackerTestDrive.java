@@ -3,6 +3,7 @@ package net.chicoronny.trackmate.lineartracker;
 import static net.chicoronny.trackmate.lineartracker.LinearTrackerKeys.KEY_INITIAL_DISTANCE;
 import static net.chicoronny.trackmate.lineartracker.LinearTrackerKeys.KEY_STICK_RADIUS;
 import static net.chicoronny.trackmate.lineartracker.LinearTrackerKeys.KEY_SUCCEEDING_DISTANCE;
+import static net.chicoronny.trackmate.lineartracker.LinearTrackerKeys.KEY_MAX_COST;
 
 import java.io.File;
 import java.util.Locale;
@@ -11,29 +12,33 @@ import java.util.Map;
 import net.chicoronny.trackmate.action.ExportTracksToSQL;
 import fiji.plugin.trackmate.Logger;
 import fiji.plugin.trackmate.Model;
+import fiji.plugin.trackmate.SelectionModel;
 import fiji.plugin.trackmate.Settings;
 import fiji.plugin.trackmate.SpotCollection;
 import fiji.plugin.trackmate.TrackMate;
 import fiji.plugin.trackmate.features.FeatureFilter;
 import fiji.plugin.trackmate.features.edges.EdgeAngleAnalyzer;
 import fiji.plugin.trackmate.features.edges.EdgeTargetAnalyzer;
+import fiji.plugin.trackmate.features.spot.MySpotRadiusEstimatorFactory;
 import fiji.plugin.trackmate.features.track.TrackDurationAnalyzer;
 import fiji.plugin.trackmate.features.track.TrackLinkingAnalyzer;
 import fiji.plugin.trackmate.features.track.TrackSpeedStatisticsAnalyzer;
 import fiji.plugin.trackmate.io.TmXmlReader;
 import fiji.plugin.trackmate.providers.DetectorProvider;
 import fiji.plugin.trackmate.providers.TrackerProvider;
+import fiji.plugin.trackmate.visualization.hyperstack.HyperStackDisplayer;
 
 public class LinearTrackerTestDrive {
 
+    @SuppressWarnings("rawtypes")
     public static void main(final String[] args) {
 	final Locale curlocale = Locale.getDefault();
 	final Locale usLocale = new Locale("en", "US"); // setting us locale
-    	Locale.setDefault(usLocale);
+    Locale.setDefault(usLocale);
     	
-    	File file = null;
+    File file = null;
 	try {
-	    file = new File("samples/FakeTracks.xml");
+	    file = new File("samples/CRTD14.xml");
 	} catch (final NullPointerException e){
 	    System.err.println(e.getMessage());
 	    return;
@@ -53,24 +58,25 @@ public class LinearTrackerTestDrive {
 	final TrackerProvider tp = new TrackerProvider(); 
 		settings.trackerFactory = tp.getFactory( LinearTrackerFactory.TRACKER_KEY );
 	final Map<String, Object> ts = settings.trackerFactory.getDefaultSettings();
-	ts.put(KEY_INITIAL_DISTANCE, 10d);
-	ts.put(KEY_SUCCEEDING_DISTANCE, 8d);
-	ts.put(KEY_STICK_RADIUS, 2d);
+	ts.put(KEY_INITIAL_DISTANCE, 2.4d);
+	ts.put(KEY_SUCCEEDING_DISTANCE, 2.2d);
+	ts.put(KEY_STICK_RADIUS, 0.8d);
+	ts.put(KEY_MAX_COST, 50d);
 	settings.trackerSettings = ts;
 	
+	settings.addSpotAnalyzerFactory(new MySpotRadiusEstimatorFactory());
 	settings.addEdgeAnalyzer(new EdgeAngleAnalyzer());
 	settings.addEdgeAnalyzer(new EdgeTargetAnalyzer());
 	settings.addTrackAnalyzer(new TrackDurationAnalyzer());
 	settings.addTrackAnalyzer(new TrackSpeedStatisticsAnalyzer());
 	settings.addTrackAnalyzer(new TrackLinkingAnalyzer());
 	
-	final FeatureFilter filterb = new FeatureFilter("TRACK_MEAN_LINK_COST", 1d, true);
-	//FeatureFilter filtera = new FeatureFilter("LINK_COST", 0.5d, true);
-	final FeatureFilter filterc = new FeatureFilter("TRACK_DURATION", 5d, true);
-	settings.addTrackFilter(filterb);
+	//final FeatureFilter filterb = new FeatureFilter("TRACK_MEAN_LINK_COST", 1d, true);
+	final FeatureFilter filterc = new FeatureFilter("TRACK_DURATION", 2d, true);
+	//settings.addTrackFilter(filterb);
 	settings.addTrackFilter(filterc);
 		
-	System.out.println("Tracker settings:");
+	System.out.println("Settings:");
 	System.out.println(settings);
 	
 	final LinearTracker lap = new LinearTracker(spots, ts);
@@ -87,6 +93,7 @@ public class LinearTrackerTestDrive {
 	
 	final TrackMate trackmate = new TrackMate(model, settings);
 	
+	trackmate.computeSpotFeatures(true);
 	trackmate.computeEdgeFeatures( true );
 	trackmate.computeTrackFeatures( true );
 	trackmate.execTrackFiltering(true);  
@@ -105,6 +112,10 @@ public class LinearTrackerTestDrive {
 	
 	final ExportTracksToSQL ex = new ExportTracksToSQL();
 	ex.execute(trackmate);
+	
+	final SelectionModel sm = new SelectionModel( model );
+	final HyperStackDisplayer view = new HyperStackDisplayer( model, sm );
+	view.render();
 	
 	Locale.setDefault(curlocale);
     }

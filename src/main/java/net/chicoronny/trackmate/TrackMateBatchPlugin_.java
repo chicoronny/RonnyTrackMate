@@ -316,17 +316,17 @@ public class TrackMateBatchPlugin_ extends SomeDialogDescriptor implements PlugI
 	    settings.detectorSettings = dmap;
 	    settings.initialSpotFilterValue = PRE_QUALITY;
 
-	    // Tracking
+	 // Tracking
 	    final TrackerProvider tp = new TrackerProvider(); 
-	    if(TRACKER.equals( "LINEAR_TRACKER" ) ){  
-	    	    settings.trackerFactory = tp.getFactory( LinearTrackerFactory.TRACKER_KEY );
+	    if(TRACKER.startsWith("LINEAR_TRACKER")){
+	       	    settings.trackerFactory = tp.getFactory( LinearTrackerFactory.TRACKER_KEY );
 	    	    final Map<String, Object> ts = settings.trackerFactory.getDefaultSettings();
 	    	    ts.put(KEY_INITIAL_DISTANCE, INITIAL_DISTANCE);
 	    	    ts.put(KEY_SUCCEEDING_DISTANCE, SUCCEEDING_DISTANCE);
 	    	    ts.put(KEY_STICK_RADIUS, STICK_RADIUS);
 	    	    ts.put(KEY_MAX_COST, MAX_COST);
-	    	    settings.trackerSettings = ts; 
-	    } else if 	(TRACKER.equals( "FAST_LAP_TRACKER")) {
+	    	    settings.trackerSettings = ts; }
+		else if(TRACKER.startsWith("FAST_LAP_TRACKER")) {
 	    	    settings.trackerFactory = tp.getFactory( FastLAPTrackerFactory.TRACKER_KEY );
 	    	    final Map<String, Object> fl = settings.trackerFactory.getDefaultSettings();
 	    	    fl.put(KEY_ALLOW_GAP_CLOSING, ALLOW_GAP_CLOSING);
@@ -337,16 +337,16 @@ public class TrackMateBatchPlugin_ extends SomeDialogDescriptor implements PlugI
 	    	    fl.put(KEY_LINKING_MAX_DISTANCE, LINKING_MAX_DISTANCE);
 	    	    fl.put(KEY_MERGING_MAX_DISTANCE, MERGING_MAX_DISTANCE);
 	    	    fl.put(KEY_SPLITTING_MAX_DISTANCE, SPLITTING_MAX_DISTANCE);
-	    	    settings.trackerSettings = fl; 
-	    } else if 	(TRACKER.equals("SIMPLE_FAST_LAP_TRACKER")) {
+	    	    settings.trackerSettings = fl; }
+		else if(TRACKER.startsWith("SIMPLE_FAST_LAP_TRACKER")) {    
 	    	    settings.trackerFactory = tp.getFactory( SimpleFastLAPTrackerFactory.TRACKER_KEY );
 	    	    final Map<String, Object> sfl = settings.trackerFactory.getDefaultSettings();
 	    	    sfl.put(KEY_ALLOW_GAP_CLOSING, ALLOW_GAP_CLOSING);
 	    	    sfl.put(KEY_GAP_CLOSING_MAX_DISTANCE, GAP_CLOSING_MAX_DISTANCE);
 	    	    sfl.put(KEY_GAP_CLOSING_MAX_FRAME_GAP, GAP_CLOSING_MAX_FRAME_GAP );
 	    	    sfl.put(KEY_LINKING_MAX_DISTANCE, LINKING_MAX_DISTANCE);
-	    	    settings.trackerSettings = sfl; 
-	    } else if (TRACKER.equals("LAP_TRACKER")) {
+	    	    settings.trackerSettings = sfl; }
+		else if (TRACKER.startsWith("LAP_TRACKER")){
 	    	    settings.trackerFactory = tp.getFactory( LAPTrackerFactory.TRACKER_KEY );
 	    	    final Map<String, Object> l = settings.trackerFactory.getDefaultSettings();
 	    	    l.put(KEY_ALLOW_GAP_CLOSING, ALLOW_GAP_CLOSING);
@@ -357,8 +357,8 @@ public class TrackMateBatchPlugin_ extends SomeDialogDescriptor implements PlugI
 	    	    l.put(KEY_LINKING_MAX_DISTANCE, LINKING_MAX_DISTANCE);
 	    	    l.put(KEY_MERGING_MAX_DISTANCE, MERGING_MAX_DISTANCE);
 	    	    l.put(KEY_SPLITTING_MAX_DISTANCE, SPLITTING_MAX_DISTANCE);
-	    	    settings.trackerSettings = l; 
-	    } else if (TRACKER.equals("SPARSE_LAP_TRACKER")) {
+	    	    settings.trackerSettings = l; }
+		else if (TRACKER.startsWith("SPARSE_LAP_TRACKER")) {
 	    	    settings.trackerFactory = tp.getFactory( SparseLAPTrackerFactory.TRACKER_KEY );
 	    	    final Map<String, Object> slp = settings.trackerFactory.getDefaultSettings();
 	    	    slp.put(KEY_ALLOW_GAP_CLOSING, ALLOW_GAP_CLOSING);
@@ -369,19 +369,18 @@ public class TrackMateBatchPlugin_ extends SomeDialogDescriptor implements PlugI
 	    	    slp.put(KEY_LINKING_MAX_DISTANCE, LINKING_MAX_DISTANCE);
 	    	    slp.put(KEY_MERGING_MAX_DISTANCE, MERGING_MAX_DISTANCE);
 	    	    slp.put(KEY_SPLITTING_MAX_DISTANCE, SPLITTING_MAX_DISTANCE);
-	    	    settings.trackerSettings = slp; 
-	    }else if (TRACKER.equals("SIMPLE_LAP_TRACKER")) {
+	    	    settings.trackerSettings = slp; }
+		else if(TRACKER.startsWith("SIMPLE_LAP_TRACKER")) {
 	    	    settings.trackerFactory = tp.getFactory( SimpleLAPTrackerFactory.TRACKER_KEY );
 	    	    final Map<String, Object> sl = settings.trackerFactory.getDefaultSettings();
 	    	    sl.put(KEY_ALLOW_GAP_CLOSING, ALLOW_GAP_CLOSING);
 	    	    sl.put(KEY_GAP_CLOSING_MAX_DISTANCE, GAP_CLOSING_MAX_DISTANCE);
 	    	    sl.put(KEY_GAP_CLOSING_MAX_FRAME_GAP, GAP_CLOSING_MAX_FRAME_GAP );
 	    	    sl.put(KEY_LINKING_MAX_DISTANCE, LINKING_MAX_DISTANCE);
-	    	    settings.trackerSettings = sl; 
-	    } else { 
+	    	    settings.trackerSettings = sl; }
+		else {
 	    	    logger.log("No Tracker found in TrackMate.properties");
-	    	    return;
-	    }
+	    	    return;}
 	    
 	 // Analyzer
 	    ClassLoader cl = ClassLoader.getSystemClassLoader();

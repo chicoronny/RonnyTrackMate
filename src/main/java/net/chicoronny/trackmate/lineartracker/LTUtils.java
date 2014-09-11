@@ -5,7 +5,7 @@ import java.io.FileFilter;
 import java.util.Collection;
 
 import fiji.plugin.trackmate.Spot;
-import fiji.plugin.trackmate.features.spot.SpotRadiusEstimatorFactory;
+import fiji.plugin.trackmate.features.spot.MySpotRadiusEstimatorFactory;
 
 public class LTUtils {
     
@@ -96,7 +96,7 @@ public class LTUtils {
      * @return the spot with estimated Radius
      */
     public static final Spot RadiusToEstimated(Spot spot) {
-	final Double diameter = spot.getFeature(SpotRadiusEstimatorFactory.ESTIMATED_DIAMETER);
+	final Double diameter = spot.getFeature(MySpotRadiusEstimatorFactory.ESTIMATED_DIAMETER);
 	if (null == diameter || diameter == 0) {
 	    return spot;
 	}

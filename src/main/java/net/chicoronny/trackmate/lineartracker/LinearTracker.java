@@ -12,8 +12,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import net.imglib2.RealCursor;
 import net.imglib2.RealPoint;
-import net.imglib2.algorithm.Benchmark;
+import net.imglib2.algorithm.MultiThreaded;
 import net.imglib2.collection.KDTree;
 import net.imglib2.collection.KDTreeNode;
 import net.imglib2.util.ValuePair;
@@ -30,7 +31,7 @@ import fiji.plugin.trackmate.util.TMUtils;
 
 
 /**
- * The Class linearTracker.
+ * The Class LinearTracker.
  * 
  * 1. Link and set a flag for all objects that are sticking more than 90% of the time
  * lapse movie, i.e not moving within a preset radius (Stick radius)
@@ -46,7 +47,7 @@ import fiji.plugin.trackmate.util.TMUtils;
  * 
  * @author Ronny Sczech
  */
-public class LinearTracker implements SpotTracker, Benchmark
+public class LinearTracker implements SpotTracker, MultiThreaded
 {
 
     /** The logger. */
@@ -64,9 +65,9 @@ public class LinearTracker implements SpotTracker, Benchmark
     /** The error message. */
     private String errorMessage;
 
-    private long processingTime;
+    private int numThreads;
 
-	private int numThreads;
+    protected int MAX_GAP = 2;
 
     /**
      * Instantiates a new tracker.
@@ -79,6 +80,12 @@ public class LinearTracker implements SpotTracker, Benchmark
     public LinearTracker(final SpotCollection spots, final Map<String, Object> settings) {
 	this.spots = spots;
 	this.settings = settings;
+	graph = new SimpleWeightedGraph<Spot, DefaultWeightedEdge>(DefaultWeightedEdge.class);
+	setNumThreads();
+	final Iterator<Spot> it = spots.iterator(true);
+	while (it.hasNext()) 
+		graph.addVertex(it.next());
+	
     }
 
     /* (non-Javadoc)
@@ -140,9 +147,7 @@ public class LinearTracker implements SpotTracker, Benchmark
 	    return false;
 	}
 	
-	final long start = System.currentTimeMillis();
-
-	reset();
+	//final long start = System.currentTimeMillis();
 
 	// Extract parameter values
 	final double initR = (Double) settings.get(KEY_INITIAL_DISTANCE);
@@ -174,15 +179,14 @@ public class LinearTracker implements SpotTracker, Benchmark
 		treeList.add(new KDTree<FlagNode<Spot>>(nextNodes, nextCoords));
 	}
 	
-	nFrames = treeList.size();
+	nFrames = treeList.size(); // for the case there are empty frames
 
 	KDTree<FlagNode<Spot>> frameTree = treeList.get(0);
 	
 	//Burn-out Sticking Particles
-	
-	final Iterator<FlagNode<Spot>> iterator = frameTree.iterator();
-	while (iterator.hasNext()) {
-	    final FlagNode<Spot> source = iterator.next();
+	final RealCursor<FlagNode<Spot>> KDcursor = frameTree.cursor();
+	while (KDcursor.hasNext()) {
+	    final FlagNode<Spot> source = KDcursor.next();
 	    
 	    int curFrame = 1;
 	    final List<FlagNode<Spot>> nodeList = new ArrayList<FlagNode<Spot>>();
@@ -204,20 +208,21 @@ public class LinearTracker implements SpotTracker, Benchmark
 		
 		while (ii.hasNext()){
 		    final FlagNode<Spot> loopNode = ii.next();
-		    loopNode.setVisited(true);
+		    //loopNode.setVisited(true);
 		    
 		    final Spot begin = oldNode.getValue();
 		    final Spot fin = loopNode.getValue(); 
-		    graph.addVertex(begin);
-		    graph.addVertex(fin);
-		    final DefaultWeightedEdge edge = graph.addEdge(begin, fin);
-		    graph.setEdgeWeight(edge, 0d);
+		    if (!graph.containsEdge(begin, fin)){
+		    
+		    	final DefaultWeightedEdge edge = graph.addEdge(begin, fin);
+		    	graph.setEdgeWeight(edge, 0d);
+		    }
 		 
 		    oldNode = loopNode;
 		}
 	    }
 	}
-
+	
 	frameTree = treeList.get(0);
 	// Main Loop over all frames
 	for (int Tree = 1; Tree < nFrames; Tree++) {
@@ -225,7 +230,7 @@ public class LinearTracker implements SpotTracker, Benchmark
 	    final RadiusNeighborFlagSearchOnKDTree rsearch = new RadiusNeighborFlagSearchOnKDTree(treeList.get(Tree));
 
 	    // retrieve spots from current frame
-	    final Iterator<FlagNode<Spot>> spotIt = frameTree.iterator();
+	    final RealCursor<FlagNode<Spot>> spotIt = frameTree.cursor();
 	    while (spotIt.hasNext()) {
 
 		final Spot source = spotIt.next().getValue();
@@ -249,7 +254,7 @@ public class LinearTracker implements SpotTracker, Benchmark
 		int count = 1;
 		FlagNode<Spot> oldNode = foundNode;
 		int succFrame = Tree + 1;
-		boolean firstRun = true;
+		int Run = 0;
 
 		while (succFrame < nFrames - 1) { 
 		    final RadiusNeighborFlagSearchOnKDTree lsearch = new 
@@ -264,36 +269,37 @@ public class LinearTracker implements SpotTracker, Benchmark
 		    lsearch.search(estimSpot, succR, oldCoords, maxCost, true); // use succeeding radius for searching spot in next frame
 		    
 		    if (lsearch.numNeighbors() < 1) {
-				if (firstRun) {  // automatic gap handling -- just one frame
-				    firstRun = false;
+				if (Run < MAX_GAP) {  // automatic gap handling
 				    //estim = LTUtils.Add(estim, preVector);
+				    Run++;
 				    succFrame++;
 				    count++;
 				    continue;
 				}
 				break;
 		    }
+		    Run = 0;
 		    // get first entry in the ordered result list
 		    final ValuePair<KDTreeNode<FlagNode<Spot>>, Double> cur = lsearch.getResults().get(0); 
 
 		    final FlagNode<Spot> loopNode = cur.getA().get();
 		    cost = cur.getB();
-
-		    oldNode.setVisited(true);
-		    loopNode.setVisited(true);
-		    
+		    		    
 		    final Spot begin = oldNode.getValue(); 
 		    final Spot fin = loopNode.getValue();
 
 		    TMUtils.localize(fin, searchCoords);
 		    preVector = LTUtils.Subtract(searchCoords, oldCoords);
 		    
-		    // make the link
-		    graph.addVertex(begin);
-		    graph.addVertex(fin);
-		    final DefaultWeightedEdge edge = graph.addEdge(begin, fin);
-		    graph.setEdgeWeight(edge, cost);
-		    
+		    // check & make the link
+		    if (!graph.containsEdge(begin,fin)){
+			    final DefaultWeightedEdge edge = graph.addEdge(begin, fin);
+			    graph.setEdgeWeight(edge, cost);
+			    
+			    oldNode.setVisited(true);
+			    loopNode.setVisited(true);
+			}
+		    		    
 		    oldNode = loopNode;
 		    count++;
 		    succFrame++;
@@ -304,21 +310,8 @@ public class LinearTracker implements SpotTracker, Benchmark
 	}
 	logger.setProgress(1d);
 	logger.setStatus("");
-	final long end = System.currentTimeMillis();
-	processingTime = end - start;
+	//final long end = System.currentTimeMillis();
 	return true;
-    }
-
-    /**
-     * Reset any link created in the graph result in this tracker, effectively
-     * creating a new graph, containing the spots but no edge.
-     */
-    private void reset() {
-	graph = new SimpleWeightedGraph<Spot, DefaultWeightedEdge>(
-		DefaultWeightedEdge.class);
-	for (final Spot spot : spots.iterable(true)) {
-	    graph.addVertex(spot);
-	}
     }
 
     /* (non-Javadoc)
@@ -352,11 +345,7 @@ public class LinearTracker implements SpotTracker, Benchmark
 	ok = ok & checkMapKeys(settings, mandatoryKeys, null, errorHolder);
 	return ok;
     }
-
-    @Override
-    public long getProcessingTime() {
-	return processingTime;
-    }
+    
 
 	/**
 	 * Ignored.
