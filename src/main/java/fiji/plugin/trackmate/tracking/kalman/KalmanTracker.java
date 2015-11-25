@@ -24,6 +24,7 @@ import fiji.plugin.trackmate.tracking.sparselap.costfunction.SquareDistCostFunct
 import fiji.plugin.trackmate.tracking.sparselap.costmatrix.JaqamanLinkingCostMatrixCreator;
 import fiji.plugin.trackmate.tracking.sparselap.linker.JaqamanLinker;
 
+
 public class KalmanTracker implements SpotTracker, Benchmark
 {
 
@@ -196,7 +197,8 @@ public class KalmanTracker implements SpotTracker, Benchmark
 			if ( !predictions.isEmpty() && !measurements.isEmpty() )
 			{
 				// Only link measurements to predictions if we have predictions.
-
+				
+			
 				final JaqamanLinkingCostMatrixCreator< ComparableRealPoint, Spot > crm = new JaqamanLinkingCostMatrixCreator< ComparableRealPoint, Spot >( predictions, measurements, CF, maxCost, ALTERNATIVE_COST_FACTOR, PERCENTILE );
 				final JaqamanLinker< ComparableRealPoint, Spot > linker = new JaqamanLinker< ComparableRealPoint, Spot >( crm );
 				if ( !linker.checkInput() || !linker.process() )
@@ -424,7 +426,7 @@ public class KalmanTracker implements SpotTracker, Benchmark
 				if ( getDoublePosition( i ) != o.getDoublePosition( i ) ) { return ( int ) Math.signum( getDoublePosition( i ) - o.getDoublePosition( i ) ); }
 				i++;
 			}
-			return 0;
+			return hashCode() - o.hashCode();
 		}
 	}
 

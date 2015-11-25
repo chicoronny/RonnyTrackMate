@@ -9,8 +9,8 @@ import fiji.plugin.trackmate.util.TMUtils;
 import fiji.plugin.trackmate.Spot;
 import net.imglib2.RealLocalizable;
 import net.imglib2.Sampler;
-import net.imglib2.collection.KDTree;
-import net.imglib2.collection.KDTreeNode;
+import net.imglib2.KDTree;
+import net.imglib2.KDTreeNode;
 import net.imglib2.neighborsearch.RadiusNeighborSearch;
 import net.imglib2.util.ValuePair;
 
@@ -82,11 +82,11 @@ public class RadiusNeighborFlagSearchOnKDTree implements
 		double[] longVector = LTUtils.Subtract(pos, oldCoords); 
 	
 	    // same factor as in LAP tracker
-	    final double spotRadiusDiff = 1 + Math.abs(currentSpot.getFeature(Spot.RADIUS).floatValue() - spotRadius) * 1.5d; 
+	    final double spotRadiusDiff = 1 + Math.abs(currentSpot.getFeature(Spot.RADIUS).floatValue() - spotRadius) * 3d; 
 	    // include angle into cost function with calculation of actual vector from the current position to the old found position
 	    final double angle = LTUtils.angleFromVectors(longVector, LTUtils.Subtract(currentPos, oldCoords)) / 2; 
 	    // set score
-	    final double cost = squDistance + spotRadiusDiff * spotRadiusDiff  + angle;
+	    final double cost = squDistance + spotRadiusDiff  + angle;
 	    // set maximal cost
 	    
 	    if (cost < maxCost) 

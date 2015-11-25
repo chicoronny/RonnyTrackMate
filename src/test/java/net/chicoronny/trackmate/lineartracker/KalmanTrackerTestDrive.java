@@ -1,9 +1,5 @@
 package net.chicoronny.trackmate.lineartracker;
 
-import static net.chicoronny.trackmate.lineartracker.LinearTrackerKeys.KEY_INITIAL_DISTANCE;
-import static net.chicoronny.trackmate.lineartracker.LinearTrackerKeys.KEY_STICK_RADIUS;
-import static net.chicoronny.trackmate.lineartracker.LinearTrackerKeys.KEY_SUCCEEDING_DISTANCE;
-import static net.chicoronny.trackmate.lineartracker.LinearTrackerKeys.KEY_MAX_COST;
 
 import java.io.File;
 import java.util.Locale;
@@ -26,9 +22,15 @@ import fiji.plugin.trackmate.features.track.TrackSpeedStatisticsAnalyzer;
 import fiji.plugin.trackmate.io.TmXmlReader;
 import fiji.plugin.trackmate.providers.DetectorProvider;
 import fiji.plugin.trackmate.providers.TrackerProvider;
+import fiji.plugin.trackmate.tracking.kalman.KalmanTracker;
+import fiji.plugin.trackmate.tracking.kalman.KalmanTrackerFactory;
 import fiji.plugin.trackmate.visualization.hyperstack.HyperStackDisplayer;
+import static fiji.plugin.trackmate.tracking.kalman.KalmanTrackerFactory.KEY_KALMAN_SEARCH_RADIUS;
+import static fiji.plugin.trackmate.tracking.TrackerKeys.KEY_LINKING_MAX_DISTANCE;
+import static fiji.plugin.trackmate.tracking.TrackerKeys.KEY_GAP_CLOSING_MAX_FRAME_GAP;
 
-public class LinearTrackerTestDrive {
+
+public class KalmanTrackerTestDrive {
 
     @SuppressWarnings("rawtypes")
     public static void main(final String[] args) {
@@ -56,12 +58,11 @@ public class LinearTrackerTestDrive {
 	final long start = System.currentTimeMillis();
 	
 	final TrackerProvider tp = new TrackerProvider(); 
-		settings.trackerFactory = tp.getFactory( LinearTrackerFactory.TRACKER_KEY );
+		settings.trackerFactory = tp.getFactory( KalmanTrackerFactory.KEY );
 	final Map<String, Object> ts = settings.trackerFactory.getDefaultSettings();
-	ts.put(KEY_INITIAL_DISTANCE, 2.5d);
-	ts.put(KEY_SUCCEEDING_DISTANCE, 2.0d);
-	ts.put(KEY_STICK_RADIUS, 0.9d);
-	ts.put(KEY_MAX_COST, 90d);
+	ts.put(KEY_KALMAN_SEARCH_RADIUS, 2.0d);
+	ts.put(KEY_LINKING_MAX_DISTANCE, 2.5d);
+	ts.put(KEY_GAP_CLOSING_MAX_FRAME_GAP, 2);
 	settings.trackerSettings = ts;
 	
 	settings.addSpotAnalyzerFactory(new MySpotRadiusEstimatorFactory());
@@ -79,7 +80,7 @@ public class LinearTrackerTestDrive {
 	System.out.println("Settings:");
 	System.out.println(settings);
 	
-	final LinearTracker lap = new LinearTracker(spots, ts);
+	final KalmanTracker lap = new KalmanTracker(spots, 2.0d, 3, 2.5d);
 	lap.setLogger(Logger.DEFAULT_LOGGER);
 
 	if (!lap.checkInput())

@@ -8,15 +8,15 @@
 	<parent>
 		<groupId>sc.fiji</groupId>
 		<artifactId>pom-fiji</artifactId>
-		<version>2.0.0-beta-1-SNAPSHOT</version>
+		<version>6.3.0</version>
 		<relativePath />
 	</parent>
 
 
 	<artifactId>RonnyTrackMate_</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-
+	<version>0.0.3-SNAPSHOT</version>
 	<name>plugins/RonnyTrackMate_.jar</name>
+
 	<description>A Maven project with the bare structure to hold TrackMate modules.</description>
 
 	<properties>
@@ -59,17 +59,26 @@
 			<artifactId>imglib2</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>net.imglib2</groupId>
-			<artifactId>imglib2-algorithms</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>net.sf.jgrapht</groupId>
 			<artifactId>jgrapht</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.xerial</groupId>
 			<artifactId>sqlite-jdbc</artifactId>
-			<version>3.7.2</version>
+			<version>3.8.7</version>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>java3d</groupId>
+			<artifactId>j3d-core-utils</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>java3d</groupId>
+			<artifactId>j3d-core</artifactId>
 		</dependency>
 	</dependencies>
 	
@@ -81,5 +90,42 @@
 		</repository>
 	</repositories>
 	
+	<scm>
+		<url>https://github.com/chicoronny/RonnyTrackMate.git</url>
+		<connection>scm:git:git://github.com/chicoronny/RonnyTrackMate</connection>
+		<developerConnection>scm:git:git@github.com:chicoronny/RonnyTrackMate</developerConnection>
+		<tag>HEAD</tag>
+	</scm>
+	
+	<build>
+	  <pluginManagement>
+	    <plugins>
+	      <plugin>
+	        <groupId>org.eclipse.m2e</groupId>
+	        <artifactId>lifecycle-mapping</artifactId>
+	        <version>1.0.0</version>
+	        <configuration>
+	          <lifecycleMappingMetadata>
+	            <pluginExecutions>
+	              <pluginExecution>
+	                <pluginExecutionFilter>
+	                  <groupId>org.apache.maven.plugins</groupId>
+	                  <artifactId>maven-enforcer-plugin</artifactId>
+	                  <versionRange>[1.0.0,)</versionRange>
+	                  <goals>
+	                    <goal>enforce</goal>
+	                  </goals>
+	                </pluginExecutionFilter>
+	                <action>
+	                  <ignore />
+	                </action>
+	              </pluginExecution>
+	            </pluginExecutions>
+	          </lifecycleMappingMetadata>
+	        </configuration>
+	      </plugin>
+	    </plugins>
+	  </pluginManagement>
+	</build>
 </project>
 

@@ -11,6 +11,7 @@ import static fiji.plugin.trackmate.tracking.TrackerKeys.KEY_GAP_CLOSING_MAX_FRA
 import static fiji.plugin.trackmate.tracking.TrackerKeys.KEY_LINKING_MAX_DISTANCE;
 import static fiji.plugin.trackmate.tracking.TrackerKeys.KEY_MERGING_MAX_DISTANCE;
 import static fiji.plugin.trackmate.tracking.TrackerKeys.KEY_SPLITTING_MAX_DISTANCE;
+import static fiji.plugin.trackmate.tracking.kalman.KalmanTrackerFactory.KEY_KALMAN_SEARCH_RADIUS;
 import static net.chicoronny.trackmate.lineartracker.LinearTrackerKeys.KEY_INITIAL_DISTANCE;
 import static net.chicoronny.trackmate.lineartracker.LinearTrackerKeys.KEY_MAX_COST;
 import static net.chicoronny.trackmate.lineartracker.LinearTrackerKeys.KEY_STICK_RADIUS;
@@ -32,9 +33,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.swing.JFrame;
-import javax.swing.WindowConstants;
-
 import net.chicoronny.trackmate.action.ExportTracksToSQL;
 import net.chicoronny.trackmate.lineartracker.LTUtils;
 import net.chicoronny.trackmate.lineartracker.LinearTrackerFactory;
@@ -50,10 +48,9 @@ import fiji.plugin.trackmate.features.FeatureFilter;
 import fiji.plugin.trackmate.features.edges.EdgeAnalyzer;
 import fiji.plugin.trackmate.features.spot.SpotAnalyzerFactory;
 import fiji.plugin.trackmate.features.track.TrackAnalyzer;
-import fiji.plugin.trackmate.gui.LogPanel;
-import fiji.plugin.trackmate.gui.descriptors.SomeDialogDescriptor;
 import fiji.plugin.trackmate.providers.DetectorProvider;
 import fiji.plugin.trackmate.providers.TrackerProvider;
+import fiji.plugin.trackmate.tracking.kalman.KalmanTrackerFactory;
 import fiji.plugin.trackmate.tracking.oldlap.FastLAPTrackerFactory;
 import fiji.plugin.trackmate.tracking.oldlap.LAPTrackerFactory;
 import fiji.plugin.trackmate.tracking.oldlap.SimpleFastLAPTrackerFactory;
@@ -66,14 +63,11 @@ import fiji.plugin.trackmate.tracking.sparselap.SparseLAPTrackerFactory;
  * This Plug-in processes files within a directory. Most parameters can be set
  * in a parameter file which has to placed in the parent directory.
  */
-public class TrackMateBatchPlugin_ extends SomeDialogDescriptor implements PlugIn
+public class TrackMateBatchPlugin_ implements PlugIn
 {
 
 	/** The Constant KEY. */
 	private static final String KEY = "BatchPlugin";
-
-	/** The frame. */
-	private JFrame frame;
 
 	/** The initial distance. */
 	private double INITIAL_DISTANCE;
@@ -159,12 +153,17 @@ public class TrackMateBatchPlugin_ extends SomeDialogDescriptor implements PlugI
 	/** The maximum cost. */
 	private Object MAX_COST;
 
+	private File file;
+	
+	/** The kalman search radius. */
+	private double KALMAN_SEARCH_RADIUS;
+
 	/**
 	 * Instantiates a new track mate batch plugin_.
 	 */
 	public TrackMateBatchPlugin_()
 	{
-		super( new LogPanel() );
+		super();
 	}
 
 	/*
@@ -229,6 +228,7 @@ public class TrackMateBatchPlugin_ extends SomeDialogDescriptor implements PlugI
 			SPOTANALYZER = props.getProperty( "SPOTANALYZER", "" ).split( "[,\n]" );
 			TRACKANALYZER = props.getProperty( "TRACKANALYZER", "" ).split( "[,\n]" );
 			EDGEANALYZER = props.getProperty( "EDGEANALYZER", "" ).split( "[,\n]" );
+			KALMAN_SEARCH_RADIUS = Double.parseDouble( props.getProperty( "KALMAN_SEARCH_RADIUS", DEFAULT_ONE ) );
 			reader.close();
 		}
 		catch ( final FileNotFoundException e1 )
@@ -378,9 +378,17 @@ public class TrackMateBatchPlugin_ extends SomeDialogDescriptor implements PlugI
 	    	    sl.put(KEY_GAP_CLOSING_MAX_FRAME_GAP, GAP_CLOSING_MAX_FRAME_GAP );
 	    	    sl.put(KEY_LINKING_MAX_DISTANCE, LINKING_MAX_DISTANCE);
 	    	    settings.trackerSettings = sl; }
+		else if(TRACKER.startsWith("KALMAN_TRACKER")) {
+    	    settings.trackerFactory = tp.getFactory( KalmanTrackerFactory.KEY );
+    	    final Map<String, Object> ka = settings.trackerFactory.getDefaultSettings();
+    	    ka.put(KEY_KALMAN_SEARCH_RADIUS, KALMAN_SEARCH_RADIUS);
+    	    ka.put(KEY_GAP_CLOSING_MAX_FRAME_GAP, GAP_CLOSING_MAX_FRAME_GAP );
+    	    ka.put(KEY_LINKING_MAX_DISTANCE, LINKING_MAX_DISTANCE);
+    	    settings.trackerSettings = ka; }
+	    
 		else {
 	    	    logger.log("No Tracker found in TrackMate.properties");
-	    	    return;}
+	    	    return;} 
 	    
 	 // Analyzer
 	    ClassLoader cl = ClassLoader.getSystemClassLoader();
@@ -483,7 +491,8 @@ public class TrackMateBatchPlugin_ extends SomeDialogDescriptor implements PlugI
 	    final String newName = file.getAbsolutePath().substring(0, file.getAbsolutePath().length()-4) + "_B.db";
 	    final File _file = new File(newName);
 	    
-	    ExportTracksToSQL.export(trackmate.getModel(), settings, _file); // SQLITE
+	    ExportTracksToSQL ex = new  ExportTracksToSQL();
+	    ex.export(trackmate.getModel(), trackmate.getSettings(), _file); // SQLITE
 	}
 	final long end = System.currentTimeMillis();
 	logger.log("All Done in " + (end - start)/1000 + "s.");
@@ -498,6 +507,7 @@ public class TrackMateBatchPlugin_ extends SomeDialogDescriptor implements PlugI
 	public static void main( final String[] args )
 	{
 		ImageJ.main( args );
+		//IJ.run("Enhance Contrast...","saturated=0.1 normalize process_all");
 		final TrackMateBatchPlugin_ plugIn = new TrackMateBatchPlugin_();
 		plugIn.run( "TrackMate.properties" );
 		return;
@@ -508,27 +518,9 @@ public class TrackMateBatchPlugin_ extends SomeDialogDescriptor implements PlugI
 	 * 
 	 * @see fiji.plugin.trackmate.gui.descriptors.WizardPanelDescriptor#getKey()
 	 */
-	@Override
 	public String getKey()
 	{
 		return KEY;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * fiji.plugin.trackmate.gui.descriptors.SomeDialogDescriptor#displayingPanel
-	 * ()
-	 */
-	@Override
-	public void displayingPanel()
-	{
-		frame = new JFrame();
-		frame.getContentPane().add( logPanel );
-		frame.setDefaultCloseOperation( WindowConstants.DISPOSE_ON_CLOSE );
-		frame.pack();
-		frame.setVisible( true );
 	}
 
 }

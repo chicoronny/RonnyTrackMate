@@ -114,57 +114,57 @@ public class LTUtils {
      * @return the collection
      */
     public static Collection<File> listFiles(File dir, String[] ext) {
-	if (!dir.isDirectory())
-	    throw new IllegalArgumentException("Parameter 'dir' is not a directory");
-	if (ext == null)
-	    throw new NullPointerException("Parameter 'ext' is null");
-
-	String[] suffixes = new String[ext.length];
-	for (int i = 0; i < ext.length; i++) {
-	    suffixes[i] = "." + ext[i];
-	}
-
-	class SuffixFileFilter implements FileFilter{
-
-	    private String[] suffixes;
-
-	    public  SuffixFileFilter(String[] suffixes){
-		if (suffixes == null) 
-		    throw new IllegalArgumentException("The array of suffixes must not be null");
-	        this.suffixes = suffixes;
-	    }
-	    
-	    // accept directories and files with the given suffix(es)
-	    @Override
-	    public boolean accept(File file) {
-		if (file.isDirectory()) return true;
-		String name = file.getName();
-		for (int i = 0; i < this.suffixes.length; i++) {
-		    if (name.endsWith(this.suffixes[i])) 
-			return true;
-		}
-		return false;
-	    }
-	};
+		if (!dir.isDirectory())
+		    throw new IllegalArgumentException("Parameter 'dir' is not a directory");
+		if (ext == null)
+		    throw new NullPointerException("Parameter 'ext' is null");
 	
-	FileFilter filter = new SuffixFileFilter(suffixes);
+		String[] suffixes = new String[ext.length];
+		for (int i = 0; i < ext.length; i++) {
+		    suffixes[i] = "." + ext[i];
+		}
 
-	Collection<File> files = new java.util.LinkedList<File>();
-	innerListFiles(files, dir, filter);
-
-	return files;
+		class SuffixFileFilter implements FileFilter{
+	
+		    private String[] suffixes;
+	
+		    public  SuffixFileFilter(String[] suffixes){
+			if (suffixes == null) 
+			    throw new IllegalArgumentException("The array of suffixes must not be null");
+		        this.suffixes = suffixes;
+		    }
+		    
+		    // accept directories and files with the given suffix(es)
+		    @Override
+		    public boolean accept(File file) {
+			if (file.isDirectory()) return true;
+			String name = file.getName();
+			for (int i = 0; i < this.suffixes.length; i++) {
+			    if (name.endsWith(this.suffixes[i])) 
+				return true;
+			}
+			return false;
+		    }
+		};
+	
+		FileFilter filter = new SuffixFileFilter(suffixes);
+	
+		Collection<File> files = new java.util.LinkedList<File>();
+		innerListFiles(files, dir, filter);
+	
+		return files;
     }
     
     private static void innerListFiles(Collection<File> files, File dir, FileFilter filter) {
-	File[] found = dir.listFiles(filter);
-	if (found != null) {
-	    for (int i = 0; i < found.length; i++) {
-		if (found[i].isDirectory())
-		    innerListFiles(files, found[i], filter);
-		else
-		    files.add(found[i]);
-
-	    }
-	}
+		File[] found = dir.listFiles(filter);
+		if (found != null) {
+		    for (int i = 0; i < found.length; i++) {
+			if (found[i].isDirectory())
+			    innerListFiles(files, found[i], filter);
+			else
+			    files.add(found[i]);
+	
+		    }
+		}
     }
 }

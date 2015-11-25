@@ -8,6 +8,9 @@ import static net.chicoronny.trackmate.lineartracker.LinearTrackerKeys.KEY_STICK
 import static net.chicoronny.trackmate.lineartracker.LinearTrackerKeys.KEY_SUCCEEDING_DISTANCE;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -15,8 +18,8 @@ import java.util.Map;
 import net.imglib2.RealCursor;
 import net.imglib2.RealPoint;
 import net.imglib2.algorithm.MultiThreaded;
-import net.imglib2.collection.KDTree;
-import net.imglib2.collection.KDTreeNode;
+import net.imglib2.KDTree;
+import net.imglib2.KDTreeNode;
 import net.imglib2.util.ValuePair;
 
 import org.jgrapht.graph.DefaultWeightedEdge;
@@ -68,6 +71,10 @@ public class LinearTracker implements SpotTracker, MultiThreaded
     private int numThreads;
 
     protected int MAX_GAP = 2;
+
+    private double ANGLE_DIFF = 0.1745d;
+
+    private double LOC_DIFF = 0.26d;
 
     /**
      * Instantiates a new tracker.
@@ -183,7 +190,10 @@ public class LinearTracker implements SpotTracker, MultiThreaded
 
 	KDTree<FlagNode<Spot>> frameTree = treeList.get(0);
 	
+	int dd = 0;
 	//Burn-out Sticking Particles
+	final Map<Integer, ArrayList<DefaultWeightedEdge>> edgesMap = new HashMap< Integer,ArrayList<DefaultWeightedEdge>>();
+	Integer edgesHash = 0;
 	final RealCursor<FlagNode<Spot>> KDcursor = frameTree.cursor();
 	while (KDcursor.hasNext()) {
 	    final FlagNode<Spot> source = KDcursor.next();
@@ -202,26 +212,28 @@ public class LinearTracker implements SpotTracker, MultiThreaded
 	    
 	    final int  burn = (int) Math.round(nFrames*0.9d);
 	    if (nodeList.size() > burn){
-		final Iterator<FlagNode<Spot>> ii = nodeList.iterator();
-		FlagNode<Spot> oldNode = source;
-		oldNode.setVisited(true);
-		
-		while (ii.hasNext()){
-		    final FlagNode<Spot> loopNode = ii.next();
-		    //loopNode.setVisited(true);
-		    
-		    final Spot begin = oldNode.getValue();
-		    final Spot fin = loopNode.getValue(); 
-		    if (!graph.containsEdge(begin, fin)){
-		    
-		    	final DefaultWeightedEdge edge = graph.addEdge(begin, fin);
-		    	graph.setEdgeWeight(edge, 0d);
-		    }
-		 
-		    oldNode = loopNode;
-		}
+			final Iterator<FlagNode<Spot>> ii = nodeList.iterator();
+			FlagNode<Spot> oldNode = source;
+			oldNode.setVisited(true);
+			dd++;
+			while (ii.hasNext()){
+			    final FlagNode<Spot> loopNode = ii.next();
+			    loopNode.setVisited(true);
+			    
+			    final Spot begin = oldNode.getValue();
+			    final Spot fin = loopNode.getValue(); 
+			    if (!graph.containsEdge(begin, fin)){
+			    
+			    	final DefaultWeightedEdge edge = graph.addEdge(begin, fin);
+			    	graph.setEdgeWeight(edge, 0d);
+			    }
+			    
+			    oldNode = loopNode;
+			}
 	    }
 	}
+	
+	logger.log("Sticking:" + dd);
 	
 	frameTree = treeList.get(0);
 	// Main Loop over all frames
@@ -255,6 +267,7 @@ public class LinearTracker implements SpotTracker, MultiThreaded
 		FlagNode<Spot> oldNode = foundNode;
 		int succFrame = Tree + 1;
 		int Run = 0;
+		ArrayList<DefaultWeightedEdge> edges = new ArrayList<DefaultWeightedEdge>();
 
 		while (succFrame < nFrames - 1) { 
 		    final RadiusNeighborFlagSearchOnKDTree lsearch = new 
@@ -295,7 +308,7 @@ public class LinearTracker implements SpotTracker, MultiThreaded
 		    if (!graph.containsEdge(begin,fin)){
 			    final DefaultWeightedEdge edge = graph.addEdge(begin, fin);
 			    graph.setEdgeWeight(edge, cost);
-			    
+			    edges.add(edge);
 			    oldNode.setVisited(true);
 			    loopNode.setVisited(true);
 			}
@@ -304,12 +317,79 @@ public class LinearTracker implements SpotTracker, MultiThreaded
 		    count++;
 		    succFrame++;
 		}
+		if (!edges.isEmpty())
+			edgesMap.put(edgesHash++, edges);
 	    }
 	    frameTree = treeList.get(Tree);
 	    logger.setProgress(Tree / nFrames);
 	}
 	logger.setProgress(1d);
 	logger.setStatus("");
+	
+	// second run to connect broken tracks
+	int cc = 0;
+	for ( ArrayList<DefaultWeightedEdge> current : edgesMap.values()) {
+		
+		if (current.size()<1) continue;
+		Spot source = graph.getEdgeSource(current.get( current.size() - 1 ));
+		Spot target = graph.getEdgeTarget(current.get( current.size() - 1 ));
+
+		final double x1 = source.getDoublePosition(0);
+		final double y1 = source.getDoublePosition(1);
+		final double x2 = target.getDoublePosition(0);
+		final double y2 = target.getDoublePosition(1);
+
+		final double angle = Math.atan2(y2 - y1, x2 - x1);
+		
+		ArrayList<ValuePair<Spot, Double>> resultPoints = new ArrayList<ValuePair<Spot, Double>>();
+
+		Map<Integer, ArrayList<DefaultWeightedEdge>> reducedSet = new HashMap<Integer, ArrayList<DefaultWeightedEdge>>(edgesMap);
+		for ( ArrayList<DefaultWeightedEdge> icurrent : reducedSet.values()) {
+			Spot isource = graph.getEdgeSource(icurrent.get( 0 ));
+			Spot itarget = graph.getEdgeTarget(icurrent.get( 0 ));
+
+			final double ix1 = isource.getDoublePosition(0);
+			final double iy1 = isource.getDoublePosition(1);
+			final double ix2 = itarget.getDoublePosition(0);
+			final double iy2 = itarget.getDoublePosition(1);
+
+			final double iangle = Math.atan2(iy2 - iy1, ix2 - ix1);
+			final double zangle = Math.atan2(iy1 - y2, ix1 - x2);
+			final double diffa = Math.abs(iangle - angle);
+			final double diffb = Math.abs(zangle - angle);
+			//final double diffc = Math.abs(zangle - iangle);
+			
+			final double linkgap = Math.abs(isource.diffTo(target, Spot.FRAME));
+
+			if (diffa < ANGLE_DIFF && diffb < LOC_DIFF && linkgap < MAX_GAP*2) {
+					
+				final double spotRadiusDiff = 1 + Math.abs(isource.getFeature(Spot.RADIUS).floatValue() - target.getFeature(Spot.RADIUS).floatValue()) * 1.5d; 
+				final double angleSum = (diffa + diffb)*180/Math.PI;
+				double cost = target.squareDistanceTo(isource)/2 + spotRadiusDiff + angleSum;
+				if (cost < maxCost)
+					resultPoints.add(new ValuePair<Spot,Double>(isource,cost));	
+			}
+		}	
+		
+		if (!resultPoints.isEmpty()){
+			Collections.sort(resultPoints, new Comparator<ValuePair<Spot,Double>>(){
+				@Override
+				public int compare(ValuePair<Spot, Double> o1,	ValuePair<Spot, Double> o2) {
+					 return Double.compare(o1.b, o2.b);
+				}												
+			});
+			ValuePair<Spot, Double> res = resultPoints.get(0);
+			if (!graph.containsEdge(target, res.getA())){
+				final DefaultWeightedEdge newEdge = graph.addEdge(target, res.getA());
+				graph.setEdgeWeight(newEdge, res.getB());
+				
+				cc++;
+			}
+		}
+		
+	}
+	logger.log("2nd run:" +cc+ " added edges");	
+	
 	//final long end = System.currentTimeMillis();
 	return true;
     }

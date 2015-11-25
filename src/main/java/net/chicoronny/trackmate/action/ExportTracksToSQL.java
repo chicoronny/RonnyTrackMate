@@ -63,7 +63,7 @@ public class ExportTracksToSQL extends AbstractTMAction {
      * @param file
      *            the file
      */
-    public static void export(final Model model, final Settings settings, final File file) {
+    public void export(final Model model, final Settings settings, final File file) {
 	Logger logger = Logger.IJ_LOGGER;
 	file.delete();
 	Statement statement = null;
@@ -74,6 +74,7 @@ public class ExportTracksToSQL extends AbstractTMAction {
 	    statement.executeUpdate("backup to '"+ file.getAbsolutePath() + "'");
 	} catch (SQLException e) {
 	    logger.log(e.getMessage());
+	    e.printStackTrace();
 	} finally {
 	    if (statement != null)
 		try {
@@ -205,9 +206,7 @@ public class ExportTracksToSQL extends AbstractTMAction {
 	    
 	    for ( final String feature : trackFeatures ){
 		Double val = fm.getTrackFeature( trackID, feature );
-		if (val==null)
-		    val=Double.valueOf(0d);
-		if (Double.isNaN(val))
+		if (val==null || Double.isNaN(val) || Double.isInfinite(val))
 	    	val=Double.valueOf(0d);
 		if (intMapTrack.get(feature))
 		    Track_String += String.format("%d, ", val.intValue());
@@ -219,63 +218,55 @@ public class ExportTracksToSQL extends AbstractTMAction {
 	    
 	    statement.executeUpdate(Track_String);
 	    
-	    for (final Spot spot : sortedTrack) {
-				
-		String SpotString = "insert into spots (id, track_id, ";
-		for ( final String feature : spotFeatures )
-			SpotString += feature.toLowerCase() + ", ";
-		SpotString = SpotString.substring(0, SpotString.length()-2);
-		SpotString += ") values ("; 
-		SpotString += spot.ID() + ", ";
-		SpotString += trackID.intValue() + ", ";
-		
+	    for (final Spot spot : sortedTrack) {				
+			String SpotString = "insert into spots (id, track_id, ";
+			for ( final String feature : spotFeatures )
+				SpotString += feature.toLowerCase() + ", ";
+			SpotString = SpotString.substring(0, SpotString.length()-2);
+			SpotString += ") values ("; 
+			SpotString += spot.ID() + ", ";
+			SpotString += trackID.intValue() + ", ";
+						
+			for ( final String feature : spotFeatures ){
+			    Double val = spot.getFeature( feature );
+			    if (val==null || Double.isNaN(val) || Double.isInfinite(val))
+			    	val=Double.valueOf(0d);
+			    if (intMapSpot.get(feature))
+			    	SpotString += String.format("%d, ", val.intValue());
+			    else
+			    	SpotString += String.format(Locale.US, "%.8f, ", val.floatValue());
+			}
+			SpotString = SpotString.substring(0, SpotString.length()-2);
+			SpotString += ")";
 			
-		for ( final String feature : spotFeatures )
-		{
-		    Double val = spot.getFeature( feature );
-		    if (val==null)
-		    	val=Double.valueOf(0d);
-		    if (Double.isNaN(val))
-		    	val=Double.valueOf(0d);
-		    if (intMapSpot.get(feature))
-		    	SpotString += String.format("%d, ", val.intValue());
-		    else
-		    	SpotString += String.format(Locale.US, "%.8f, ", val.floatValue());
-		}
-		SpotString = SpotString.substring(0, SpotString.length()-2);
-		SpotString += ")";
-		
-		statement.executeUpdate(SpotString);
+			statement.executeUpdate(SpotString);
 	    }
 	    
 	    for ( final DefaultWeightedEdge edge : trackEdges ){
 		
-		String EdgeString = "insert into edges (track_id, ";
-		for ( final String feature : edgeFeatures )
-			EdgeString += feature.toLowerCase() + ", ";
-		EdgeString = EdgeString.substring(0, EdgeString.length()-2);
-		EdgeString += ") values (";
-		EdgeString += trackID.intValue() + ", ";
-		
-		for ( final String feature : edgeFeatures )
-		{
-		    Double val = fm.getEdgeFeature( edge, feature );
-		    if (val==null)
-		    	val=Double.valueOf(0d);
-		    if (Double.isNaN(val))
-		    	val=Double.valueOf(0d);
-		    if (intMapEdge.get(feature))
-		    	EdgeString += String.format("%d, ", val.intValue());
-		    else
-		    	EdgeString += String.format(Locale.US, "%.8f, ", val.floatValue());
-		}
-		EdgeString = EdgeString.substring(0, EdgeString.length()-2);
-		EdgeString += ")";
-		
-		statement.executeUpdate(EdgeString);
+			String EdgeString = "insert into edges (track_id, ";
+			for ( final String feature : edgeFeatures )
+				EdgeString += feature.toLowerCase() + ", ";
+			EdgeString = EdgeString.substring(0, EdgeString.length()-2);
+			EdgeString += ") values (";
+			EdgeString += trackID.intValue() + ", ";
+			
+			for ( final String feature : edgeFeatures )
+			{
+			    Double val = fm.getEdgeFeature( edge, feature );
+			    if (val==null || Double.isNaN(val) || Double.isInfinite(val))
+			    	val=Double.valueOf(0d);
+			    if (intMapEdge.get(feature))
+			    	EdgeString += String.format("%d, ", val.intValue());
+			    else
+			    	EdgeString += String.format(Locale.US, "%.8f, ", val.floatValue());
+			}
+			EdgeString = EdgeString.substring(0, EdgeString.length()-2);
+			EdgeString += ")";
+			
+			statement.executeUpdate(EdgeString);
 	    }
-	}
-	
+		}
     }
     
 
