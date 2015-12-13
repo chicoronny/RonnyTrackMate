@@ -19,8 +19,7 @@ import net.imglib2.util.ValuePair;
  * 
  * This class is inherited by RadiusNeighborSearch with FlagNode of Spot as type.
  */
-public class RadiusNeighborFlagSearchOnKDTree implements
-	RadiusNeighborSearch<FlagNode<Spot>> {
+public class RadiusNeighborFlagSearchOnKDTree implements RadiusNeighborSearch<FlagNode<Spot>> {
 
     /** The KD tree. */
     protected KDTree<FlagNode<Spot>> tree;
@@ -41,10 +40,10 @@ public class RadiusNeighborFlagSearchOnKDTree implements
      *            the KD tree
      */
     public RadiusNeighborFlagSearchOnKDTree(KDTree<FlagNode<Spot>> tree) {
-	n = tree.numDimensions();
-	pos = new double[n];
-	this.tree = tree;
-	this.resultPoints = new ArrayList<ValuePair<KDTreeNode<FlagNode<Spot>>, Double>>();
+    	n = tree.numDimensions();
+    	pos = new double[n];
+    	this.tree = tree;
+    	this.resultPoints = new ArrayList<ValuePair<KDTreeNode<FlagNode<Spot>>, Double>>();
     }
 
     /**
@@ -67,7 +66,7 @@ public class RadiusNeighborFlagSearchOnKDTree implements
      * 		  set a maximum cost for linking
      */
     protected void searchNode(final KDTreeNode<FlagNode<Spot>> current,
-	    final double squRadius, float spotRadius, double[] oldCoords, double maxCost) {
+	    final double squRadius, float spotRadius, float quality, double[] oldCoords, double maxCost) {
 	// consider the current node
 	final double squDistance = current.squDistanceTo(pos);
 	boolean visited = current.get().isVisited();
@@ -77,20 +76,19 @@ public class RadiusNeighborFlagSearchOnKDTree implements
 	TMUtils.localize(currentSpot, currentPos);
 	
 	if (squDistance <= squRadius && !visited) {
-		
 		// calculate reference vector from estimated search position to the old found position from the frame before
 		double[] longVector = LTUtils.Subtract(pos, oldCoords); 
-	
+		//
+	    final double qualityDiff =  Math.abs(currentSpot.getFeature(Spot.QUALITY).floatValue() - quality);
 	    // same factor as in LAP tracker
-	    final double spotRadiusDiff = 1 + Math.abs(currentSpot.getFeature(Spot.RADIUS).floatValue() - spotRadius) * 3d; 
+	    final double spotRadiusDiff = 1 + Math.abs(currentSpot.getFeature(Spot.RADIUS).floatValue() - spotRadius) * 6d; 
 	    // include angle into cost function with calculation of actual vector from the current position to the old found position
 	    final double angle = LTUtils.angleFromVectors(longVector, LTUtils.Subtract(currentPos, oldCoords)) / 2; 
 	    // set score
-	    final double cost = squDistance + spotRadiusDiff  + angle;
+	    final double cost = squDistance/4 + spotRadiusDiff + qualityDiff/4 + angle;
 	    // set maximal cost
-	    
 	    if (cost < maxCost) 
-		resultPoints.add(new ValuePair<KDTreeNode<FlagNode<Spot>>, Double>(current, cost));
+	    	resultPoints.add(new ValuePair<KDTreeNode<FlagNode<Spot>>, Double>(current, cost));
 	}
 
 	final double axisDiff = pos[current.getSplitDimension()] - current.getSplitCoordinate();
@@ -101,11 +99,11 @@ public class RadiusNeighborFlagSearchOnKDTree implements
 	final KDTreeNode<FlagNode<Spot>> nearChild = leftIsNearBranch ? current.left : current.right;
 	final KDTreeNode<FlagNode<Spot>> awayChild = leftIsNearBranch ? current.right : current.left;
 	if (nearChild != null)
-	    searchNode(nearChild, squRadius, spotRadius, oldCoords, maxCost);
+	    searchNode(nearChild, squRadius, spotRadius, quality, oldCoords, maxCost);
 
 	// search the away branch - maybe
 	if ((axisSquDistance <= squRadius) && (awayChild != null))
-	    searchNode(awayChild, squRadius, spotRadius, oldCoords, maxCost);
+	    searchNode(awayChild, squRadius, spotRadius, quality, oldCoords, maxCost);
     }
 
     /**
@@ -182,8 +180,9 @@ public class RadiusNeighborFlagSearchOnKDTree implements
     public void search(final Spot reference, final double radius, double[] oldCoords, double maxCost, final boolean sortResults) {
 	TMUtils.localize(reference, pos);
 	final float sourceSpotRadius = reference.getFeature(Spot.RADIUS).floatValue();
+	final float quality = reference.getFeature(Spot.QUALITY).floatValue();
 	resultPoints.clear();
-	searchNode(tree.getRoot(), radius * radius, sourceSpotRadius, oldCoords, maxCost);
+	searchNode(tree.getRoot(), radius * radius, sourceSpotRadius, quality, oldCoords, maxCost);
 	if (sortResults) {
 	    Collections.sort(resultPoints,
 			    new Comparator<ValuePair<KDTreeNode<FlagNode<Spot>>, Double>>() {
@@ -193,8 +192,8 @@ public class RadiusNeighborFlagSearchOnKDTree implements
 					final ValuePair<KDTreeNode<FlagNode<Spot>>, Double> o2) {
 				    return Double.compare(o1.b, o2.b);
 				}
-			    });
-	}
+		    });
+		}
     }
 
     // more are less obsolete
@@ -206,18 +205,32 @@ public class RadiusNeighborFlagSearchOnKDTree implements
 	assert radius >= 0;
 	reference.localize(pos);
 	resultPoints.clear();
-	searchNode(tree.getRoot(), radius * radius, 1f, new double[3],100000d);
+	searchNode(tree.getRoot(), radius * radius, 3f, 255f, new double[3],100000d);
 	if (sortResults) {
 	    Collections.sort(resultPoints,
 			    new Comparator<ValuePair<KDTreeNode<FlagNode<Spot>>, Double>>() {
 				@Override
-				public int compare(
-					final ValuePair<KDTreeNode<FlagNode<Spot>>, Double> o1,
-					final ValuePair<KDTreeNode<FlagNode<Spot>>, Double> o2) {
-				    return Double.compare(o1.b, o2.b);
+				public int compare(final ValuePair<KDTreeNode<FlagNode<Spot>>, Double> o1, final ValuePair<KDTreeNode<FlagNode<Spot>>, Double> o2) {
+					return Double.compare(o1.b, o2.b);
 				}
 			    });
 	}
+    }
+    
+    public void search(final RealLocalizable reference, final double radius, float spotRadius, double maxCost, final boolean sortResults) {
+    	assert radius >= 0;
+    	reference.localize(pos);
+    	resultPoints.clear();
+    	searchNode(tree.getRoot(), radius * radius, spotRadius, 255f, new double[3], maxCost);
+    	if (sortResults) {
+    	    Collections.sort(resultPoints,
+    			    new Comparator<ValuePair<KDTreeNode<FlagNode<Spot>>, Double>>() {
+    				@Override
+    				public int compare(final ValuePair<KDTreeNode<FlagNode<Spot>>, Double> o1, final ValuePair<KDTreeNode<FlagNode<Spot>>, Double> o2) {
+    					return Double.compare(o1.b, o2.b);
+    				}
+    			    });
+    	}
     }
 
 }

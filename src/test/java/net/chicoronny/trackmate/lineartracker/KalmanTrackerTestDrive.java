@@ -23,7 +23,6 @@ import fiji.plugin.trackmate.io.TmXmlReader;
 import fiji.plugin.trackmate.providers.DetectorProvider;
 import fiji.plugin.trackmate.providers.TrackerProvider;
 import fiji.plugin.trackmate.tracking.kalman.KalmanTracker;
-import fiji.plugin.trackmate.tracking.kalman.KalmanTrackerFactory;
 import fiji.plugin.trackmate.visualization.hyperstack.HyperStackDisplayer;
 import static fiji.plugin.trackmate.tracking.kalman.KalmanTrackerFactory.KEY_KALMAN_SEARCH_RADIUS;
 import static fiji.plugin.trackmate.tracking.TrackerKeys.KEY_LINKING_MAX_DISTANCE;
@@ -58,7 +57,7 @@ public class KalmanTrackerTestDrive {
 	final long start = System.currentTimeMillis();
 	
 	final TrackerProvider tp = new TrackerProvider(); 
-		settings.trackerFactory = tp.getFactory( KalmanTrackerFactory.KEY );
+		settings.trackerFactory = tp.getFactory( "KALMAN_TRACKER" );
 	final Map<String, Object> ts = settings.trackerFactory.getDefaultSettings();
 	ts.put(KEY_KALMAN_SEARCH_RADIUS, 2.0d);
 	ts.put(KEY_LINKING_MAX_DISTANCE, 2.5d);

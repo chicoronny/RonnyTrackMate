@@ -38,9 +38,7 @@ public class ExportTracksToSQL extends AbstractTMAction {
 		"<p> " +
 		"The file will have one element per track, and each track " +
 		"contains several spot elements. These spots are " +
-		"sorted by frame number, and have 4 numerical attributes: " +
-		"the frame number this spot is in, and its X, Y, Z position in " +
-		"physical units as specified in the image properties. " +
+		"sorted by frame number"+
 		"<p>" +
 		"As such, this format <u>cannot</u> handle track merging and " +
 		"splitting properly, and is suited only for non-branching tracks." +

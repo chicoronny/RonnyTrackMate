@@ -7,6 +7,7 @@ import static net.chicoronny.trackmate.lineartracker.LinearTrackerKeys.KEY_INITI
 import static net.chicoronny.trackmate.lineartracker.LinearTrackerKeys.KEY_MAX_COST;
 import static net.chicoronny.trackmate.lineartracker.LinearTrackerKeys.KEY_STICK_RADIUS;
 import static net.chicoronny.trackmate.lineartracker.LinearTrackerKeys.KEY_SUCCEEDING_DISTANCE;
+import static net.chicoronny.trackmate.lineartracker.LinearTrackerKeys.KEY_ESTIMATE_RADIUS;
 
 import java.awt.Font;
 import java.util.HashMap;
@@ -17,6 +18,8 @@ import javax.swing.SwingConstants;
 
 import fiji.plugin.trackmate.gui.ConfigurationPanel;
 import fiji.plugin.trackmate.gui.panels.components.JNumericTextField;
+
+import javax.swing.JCheckBox;
 
 /**
  * The Class linearTrackerSettingsPanel.
@@ -61,6 +64,7 @@ public class LinearTrackerSettingsPanel extends ConfigurationPanel {
 
     /** The max cost field. */
     private JNumericTextField maxCostField;
+    private JCheckBox chckbxEstimateRadius;
 
     /**
      * Instantiates a new linear tracker settings panel.
@@ -164,22 +168,27 @@ public class LinearTrackerSettingsPanel extends ConfigurationPanel {
 	labelUnit3.setFont(FONT);
 	labelUnit3.setBounds(236, 368, 34, 20);
 	add(labelUnit3);
+	
+	chckbxEstimateRadius = new JCheckBox("Estimate Radius");
+	chckbxEstimateRadius.setFont(FONT);
+	chckbxEstimateRadius.setBounds(10, 428, 128, 23);
+	add(chckbxEstimateRadius);
     }
 
-    /* (non-Javadoc)
-     * @see fiji.plugin.trackmate.gui.ConfigurationPanel#setSettings(java.util.Map)
-     */
-    @Override
-    public void setSettings(final Map<String, Object> settings) {
-	initDistField.setText(String.format("%.1f",
-		(Double) settings.get(KEY_INITIAL_DISTANCE)));
-	initSuccField.setText(String.format("%.1f",
-		(Double) settings.get(KEY_SUCCEEDING_DISTANCE)));
-	initStickField.setText(String.format("%.1f",
-		(Double) settings.get(KEY_STICK_RADIUS)));
-	maxCostField.setText(String.format("%.1f",
-		(Double) settings.get(KEY_MAX_COST)));
-    }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * fiji.plugin.trackmate.gui.ConfigurationPanel#setSettings(java.util.Map)
+	 */
+	@Override
+	public void setSettings(final Map<String, Object> settings) {
+		initDistField.setText(String.format("%.1f", (Double) settings.get(KEY_INITIAL_DISTANCE)));
+		initSuccField.setText(String.format("%.1f", (Double) settings.get(KEY_SUCCEEDING_DISTANCE)));
+		initStickField.setText(String.format("%.1f", (Double) settings.get(KEY_STICK_RADIUS)));
+		maxCostField.setText(String.format("%.1f", (Double) settings.get(KEY_MAX_COST)));
+		chckbxEstimateRadius.setSelected((Boolean) settings.get(KEY_ESTIMATE_RADIUS));
+	}
 
     /* (non-Javadoc)
      * @see fiji.plugin.trackmate.gui.ConfigurationPanel#getSettings()
@@ -191,7 +200,7 @@ public class LinearTrackerSettingsPanel extends ConfigurationPanel {
 	settings.put(KEY_SUCCEEDING_DISTANCE, initSuccField.getValue());
 	settings.put(KEY_STICK_RADIUS, initStickField.getValue());
 	settings.put(KEY_MAX_COST, maxCostField.getValue());
+	settings.put(KEY_ESTIMATE_RADIUS, chckbxEstimateRadius.isSelected());
 	return settings;
     }
-
 }

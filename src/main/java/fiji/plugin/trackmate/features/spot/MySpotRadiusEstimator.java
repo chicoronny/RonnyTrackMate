@@ -10,8 +10,8 @@ import fiji.plugin.trackmate.Spot;
 import fiji.plugin.trackmate.util.SpotNeighborhood;
 import fiji.plugin.trackmate.util.SpotNeighborhoodCursor;
 
-public class MySpotRadiusEstimator< T extends RealType< T >> extends IndependentSpotFeatureAnalyzer< T >
-{
+@SuppressWarnings("deprecation")
+public class MySpotRadiusEstimator< T extends RealType< T >> extends IndependentSpotFeatureAnalyzer< T >{
 
 	/*
 	 * FIELDS
@@ -33,21 +33,18 @@ public class MySpotRadiusEstimator< T extends RealType< T >> extends Independent
 	 * <code>diameter</code> * {@value #MAX_DIAMETER_RATIO}. The optimum is them
 	 * calculated by doing an interpolation over calculated values.
 	 */
-	public MySpotRadiusEstimator( final ImgPlus<T> img, final Iterator< Spot > spots )
-	{
+	public MySpotRadiusEstimator( final ImgPlus<T> img, final Iterator< Spot > spots ){
 		super( img, spots );
 	}
 
 	@Override
-	public final void process( final Spot spot )
-	{
+	public final void process( final Spot spot ){
 
 		// Get diameter array and radius squared
 		final double radius = spot.getFeature( Spot.RADIUS );
 		final double[] diameters = prepareDiameters( radius * 2, nDiameters );
 		final double[] r2 = new double[ nDiameters ];
-		for ( int i = 0; i < r2.length; i++ )
-		{
+		for ( int i = 0; i < r2.length; i++ ){
 			r2[ i ] = diameters[ i ] * diameters[ i ] / 4;
 		}
 
@@ -63,13 +60,11 @@ public class MySpotRadiusEstimator< T extends RealType< T >> extends Independent
 		final SpotNeighborhoodCursor< T > cursor = neighborhood.cursor();
 		double d2, val;
 		int i;
-		while ( cursor.hasNext() )
-		{
+		while ( cursor.hasNext() ){
 			cursor.fwd();
 			d2 = cursor.getDistanceSquared();
 			val = cursor.get().getRealDouble();
-			for ( i = 0; i < nDiameters && d2 > r2[ i ]; i++ )
-			{
+			for ( i = 0; i < nDiameters && d2 > r2[ i ]; i++ ){
 				ring_intensities[ i ] += val;
 				ring_volumes[ i ]++;
 			}
@@ -83,8 +78,7 @@ public class MySpotRadiusEstimator< T extends RealType< T >> extends Independent
 		// Calculate contrasts as minus difference between outer and inner rings
 		// mean intensity
 		final double[] contrasts = new double[ diameters.length - 1 ];
-		for ( int j = 0; j < contrasts.length - 1; j++ )
-		{
+		for ( int j = 0; j < contrasts.length - 1; j++ ){
 			contrasts[ j + 1 ] = -( mean_intensities[ j + 1 ] - mean_intensities[ j ] );
 			// System.out.println(String.format("For diameter %.1f, found contrast of %.1f",
 			// diameters[j], contrasts[j])); //DEBUG
@@ -93,44 +87,35 @@ public class MySpotRadiusEstimator< T extends RealType< T >> extends Independent
 		// Find max contrast
 		double maxConstrast = Float.NEGATIVE_INFINITY;
 		int maxIndex = 0;
-		for ( int j = 0; j < contrasts.length; j++ )
-		{
-			if ( contrasts[ j ] > maxConstrast )
-			{
+		for ( int j = 0; j < contrasts.length; j++ ){
+			if ( contrasts[ j ] > maxConstrast ){
 				maxConstrast = contrasts[ j ];
 				maxIndex = j;
 			}
 		}
 
 		double bestDiameter;
-		if ( 1 >= maxIndex || contrasts.length - 1 == maxIndex )
-		{
+		if ( 1 >= maxIndex || contrasts.length - 1 == maxIndex ){
 			bestDiameter = diameters[ maxIndex ];
-		}
-		else
-		{
+		}else{
 			bestDiameter = quadratic1DInterpolation( diameters[ maxIndex - 1 ], contrasts[ maxIndex - 1 ], diameters[ maxIndex ], contrasts[ maxIndex ], diameters[ maxIndex + 1 ], contrasts[ maxIndex + 1 ] );
 		}
 		spot.putFeature( ESTIMATED_DIAMETER, bestDiameter );
 	}
 
-	private static final double quadratic1DInterpolation( final double x1, final double y1, final double x2, final double y2, final double x3, final double y3 )
-	{
+	private static final double quadratic1DInterpolation( final double x1, final double y1, final double x2, final double y2, final double x3, final double y3 ){
 		final double d2 = 2 * ( ( y3 - y2 ) / ( x3 - x2 ) - ( y2 - y1 ) / ( x2 - x1 ) ) / ( x3 - x1 );
 		if ( d2 == 0 )
 			return x2;
-		else
-		{
+		else{
 			final double d1 = ( y3 - y2 ) / ( x3 - x2 ) - d2 / 2 * ( x3 - x2 );
 			return x2 - d1 / d2;
 		}
 	}
 
-	private static final double[] prepareDiameters( final double centralDiameter, final int nDiameters )
-	{
+	private static final double[] prepareDiameters( final double centralDiameter, final int nDiameters ){
 		final double[] diameters = new double[ nDiameters ];
-		for ( int i = 0; i < diameters.length; i++ )
-		{
+		for ( int i = 0; i < diameters.length; i++ ){
 			diameters[ i ] = centralDiameter * ( MIN_DIAMETER_RATIO + i * ( MAX_DIAMETER_RATIO - MIN_DIAMETER_RATIO ) / ( nDiameters - 1 ) );
 		}
 		return diameters;

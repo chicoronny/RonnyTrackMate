@@ -50,7 +50,6 @@ import fiji.plugin.trackmate.features.spot.SpotAnalyzerFactory;
 import fiji.plugin.trackmate.features.track.TrackAnalyzer;
 import fiji.plugin.trackmate.providers.DetectorProvider;
 import fiji.plugin.trackmate.providers.TrackerProvider;
-import fiji.plugin.trackmate.tracking.kalman.KalmanTrackerFactory;
 import fiji.plugin.trackmate.tracking.oldlap.FastLAPTrackerFactory;
 import fiji.plugin.trackmate.tracking.oldlap.LAPTrackerFactory;
 import fiji.plugin.trackmate.tracking.oldlap.SimpleFastLAPTrackerFactory;
@@ -379,7 +378,7 @@ public class TrackMateBatchPlugin_ implements PlugIn
 	    	    sl.put(KEY_LINKING_MAX_DISTANCE, LINKING_MAX_DISTANCE);
 	    	    settings.trackerSettings = sl; }
 		else if(TRACKER.startsWith("KALMAN_TRACKER")) {
-    	    settings.trackerFactory = tp.getFactory( KalmanTrackerFactory.KEY );
+    	    settings.trackerFactory = tp.getFactory( "KALMAN_TRACKER" );
     	    final Map<String, Object> ka = settings.trackerFactory.getDefaultSettings();
     	    ka.put(KEY_KALMAN_SEARCH_RADIUS, KALMAN_SEARCH_RADIUS);
     	    ka.put(KEY_GAP_CLOSING_MAX_FRAME_GAP, GAP_CLOSING_MAX_FRAME_GAP );

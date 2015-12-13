@@ -21,6 +21,7 @@ import fiji.plugin.trackmate.Model;
 import fiji.plugin.trackmate.Spot;
 import net.imglib2.multithreading.SimpleMultiThreading;
 
+@SuppressWarnings("deprecation")
 @Plugin( type = TrackAnalyzer.class )
 public class TrackLinkingAnalyzer implements TrackAnalyzer {
     

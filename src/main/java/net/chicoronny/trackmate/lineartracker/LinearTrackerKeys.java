@@ -17,6 +17,8 @@ public class LinearTrackerKeys {
     /** The Constant KEY_MAX_COST. */
     public static final String KEY_MAX_COST = "MAX_COST";
     
+    public static final String KEY_ESTIMATE_RADIUS = "ESTIMATE_RADIUS";
+    
     /** The Constant DEFAULT_INITIAL_DISTANCE. */
     public static final double 	DEFAULT_INITIAL_DISTANCE = 10.0;
     

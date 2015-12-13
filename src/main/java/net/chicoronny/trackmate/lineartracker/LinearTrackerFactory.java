@@ -1,6 +1,7 @@
 package net.chicoronny.trackmate.lineartracker;
 
 import static fiji.plugin.trackmate.io.IOUtils.readDoubleAttribute;
+import static fiji.plugin.trackmate.io.IOUtils.readBooleanAttribute;
 import static fiji.plugin.trackmate.io.IOUtils.writeAttribute;
 import static net.chicoronny.trackmate.lineartracker.LinearTrackerKeys.DEFAULT_INITIAL_DISTANCE;
 import static net.chicoronny.trackmate.lineartracker.LinearTrackerKeys.DEFAULT_MAX_COST;
@@ -10,6 +11,7 @@ import static net.chicoronny.trackmate.lineartracker.LinearTrackerKeys.KEY_INITI
 import static net.chicoronny.trackmate.lineartracker.LinearTrackerKeys.KEY_MAX_COST;
 import static net.chicoronny.trackmate.lineartracker.LinearTrackerKeys.KEY_STICK_RADIUS;
 import static net.chicoronny.trackmate.lineartracker.LinearTrackerKeys.KEY_SUCCEEDING_DISTANCE;
+import static net.chicoronny.trackmate.lineartracker.LinearTrackerKeys.KEY_ESTIMATE_RADIUS;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -84,7 +86,7 @@ public class LinearTrackerFactory implements SpotTrackerFactory {
      */
     @Override
     public SpotTracker create(final SpotCollection spots, final Map<String, Object> settings) {
-	return new LinearTracker(spots, settings);
+    	return new LinearTracker(spots, settings);
     }
 
     /* (non-Javadoc)
@@ -107,7 +109,8 @@ public class LinearTrackerFactory implements SpotTrackerFactory {
 	ok = ok	& writeAttribute(settings, element, KEY_SUCCEEDING_DISTANCE, Double.class, str);
 	ok = ok	& writeAttribute(settings, element, KEY_STICK_RADIUS, Double.class, str);
 	ok = ok	& writeAttribute(settings, element, KEY_MAX_COST, Double.class, str);
-
+	ok = ok	& writeAttribute(settings, element, KEY_ESTIMATE_RADIUS, Boolean.class, str);
+	
 	if (!ok) {
 	    errorMessage = str.toString();
 	}
@@ -126,6 +129,7 @@ public class LinearTrackerFactory implements SpotTrackerFactory {
 	ok = ok	& readDoubleAttribute(element, settings, KEY_SUCCEEDING_DISTANCE, errorHolder);
 	ok = ok	& readDoubleAttribute(element, settings, KEY_STICK_RADIUS, errorHolder);
 	ok = ok	& readDoubleAttribute(element, settings, KEY_MAX_COST, errorHolder);
+	ok = ok	& readBooleanAttribute(element, settings, KEY_ESTIMATE_RADIUS, errorHolder);
 
 	if (!ok) {
 	    errorMessage = errorHolder.toString();
@@ -146,7 +150,7 @@ public class LinearTrackerFactory implements SpotTrackerFactory {
 	str.append(String.format("Succeeding distance: %.1f\n",	(Double) sm.get(KEY_SUCCEEDING_DISTANCE)));
 	str.append(String.format("Stick Radius: %.1f\n", (Double) sm.get(KEY_STICK_RADIUS)));
 	str.append(String.format("Max Cost: %.1f\n", (Double) sm.get(KEY_MAX_COST)));
-
+	str.append(String.format("Estimate Radius: %b\n", (Boolean) sm.get(KEY_ESTIMATE_RADIUS)));
 	return str.toString();
     }
 
@@ -160,7 +164,7 @@ public class LinearTrackerFactory implements SpotTrackerFactory {
 	settings.put(KEY_SUCCEEDING_DISTANCE, DEFAULT_SUCCEEDING_DISTANCE);
 	settings.put(KEY_STICK_RADIUS, DEFAULT_STICK_RADIUS);
 	settings.put(KEY_MAX_COST, DEFAULT_MAX_COST);
-
+	settings.put(KEY_ESTIMATE_RADIUS, false);
 	return settings;
     }
 

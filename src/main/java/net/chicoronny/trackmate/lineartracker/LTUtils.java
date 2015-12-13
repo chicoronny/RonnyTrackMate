@@ -3,7 +3,6 @@ package net.chicoronny.trackmate.lineartracker;
 import java.io.File;
 import java.io.FileFilter;
 import java.util.Collection;
-
 import fiji.plugin.trackmate.Spot;
 import fiji.plugin.trackmate.features.spot.MySpotRadiusEstimatorFactory;
 
@@ -103,6 +102,7 @@ public class LTUtils {
 	spot.putFeature(Spot.RADIUS, diameter / 2);
 	return spot;
     }
+ 
     
     /**
      * List files.
