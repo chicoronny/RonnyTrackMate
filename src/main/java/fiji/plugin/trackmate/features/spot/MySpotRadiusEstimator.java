@@ -10,12 +10,7 @@ import fiji.plugin.trackmate.Spot;
 import fiji.plugin.trackmate.util.SpotNeighborhood;
 import fiji.plugin.trackmate.util.SpotNeighborhoodCursor;
 
-@SuppressWarnings("deprecation")
 public class MySpotRadiusEstimator< T extends RealType< T >> extends IndependentSpotFeatureAnalyzer< T >{
-
-	/*
-	 * FIELDS
-	 */
 
 	private static final double MIN_DIAMETER_RATIO = 0.02f;
 

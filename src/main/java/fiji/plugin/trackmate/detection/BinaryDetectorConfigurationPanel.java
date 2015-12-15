@@ -33,11 +33,12 @@ import javax.swing.JSlider;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.JButton;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ChangeEvent;
 
 public class BinaryDetectorConfigurationPanel extends ConfigurationPanel {
 	
@@ -59,44 +60,20 @@ public class BinaryDetectorConfigurationPanel extends ConfigurationPanel {
 		lblHelpText.setText( infoText.replace( "<br>", "" ).replace( "<p>", "<p align=\"justify\">" ).replace( "<html>", "<html><p align=\"justify\">" ) );
 		add(lblHelpText);
 		
-		JLabel lblMinimumSize = new JLabel("Minimum Size");
-		springLayout.putConstraint(SpringLayout.WEST, lblMinimumSize, 0, SpringLayout.WEST, lblHelpText);
-		springLayout.putConstraint(SpringLayout.SOUTH, lblMinimumSize, -341, SpringLayout.SOUTH, this);
-		lblMinimumSize.setFont(FONT);
-		add(lblMinimumSize);
-		
 		JLabel lblMaximumSize = new JLabel("Maximum Size");
+		springLayout.putConstraint(SpringLayout.NORTH, lblMaximumSize, 79, SpringLayout.SOUTH, lblHelpText);
 		springLayout.putConstraint(SpringLayout.WEST, lblMaximumSize, 0, SpringLayout.WEST, lblHelpText);
 		lblMaximumSize.setFont(FONT);
 		add(lblMaximumSize);
 		
 		JLabel lblSettings = new JLabel("Settings for: " + detectorName);
+		springLayout.putConstraint(SpringLayout.WEST, lblSettings, 0, SpringLayout.WEST, lblHelpText);
+		springLayout.putConstraint(SpringLayout.SOUTH, lblSettings, -8, SpringLayout.NORTH, lblHelpText);
 		lblSettings.setFont(BIG_FONT);
-		springLayout.putConstraint(SpringLayout.WEST, lblSettings, 10, SpringLayout.WEST, this);
-		springLayout.putConstraint(SpringLayout.SOUTH, lblSettings, -9, SpringLayout.NORTH, lblHelpText);
 		add(lblSettings);
 		
-		textFieldMin = new JTextField();
-		textFieldMin.setHorizontalAlignment(SwingConstants.TRAILING);
-		textFieldMin.setText("10");
-		springLayout.putConstraint(SpringLayout.NORTH, textFieldMin, 72, SpringLayout.SOUTH, lblSettings);
-		springLayout.putConstraint(SpringLayout.WEST, textFieldMin, 22, SpringLayout.EAST, lblMinimumSize);
-		springLayout.putConstraint(SpringLayout.EAST, textFieldMin, 105, SpringLayout.EAST, lblMinimumSize);
-		add(textFieldMin);
-		textFieldMin.setColumns(10);
-		
-		textFieldMax = new JTextField();
-		springLayout.putConstraint(SpringLayout.WEST, textFieldMax, 19, SpringLayout.EAST, lblMaximumSize);
-		springLayout.putConstraint(SpringLayout.EAST, textFieldMax, -122, SpringLayout.EAST, this);
-		springLayout.putConstraint(SpringLayout.NORTH, lblMaximumSize, 9, SpringLayout.NORTH, textFieldMax);
-		springLayout.putConstraint(SpringLayout.NORTH, textFieldMax, 1, SpringLayout.SOUTH, textFieldMin);
-		textFieldMax.setHorizontalAlignment(SwingConstants.TRAILING);
-		textFieldMax.setText("10000");
-		add(textFieldMax);
-		textFieldMax.setColumns(10);
-		
 		btnPreview = new JButton("Preview");
-		springLayout.putConstraint(SpringLayout.WEST, btnPreview, 10, SpringLayout.WEST, this);
+		springLayout.putConstraint(SpringLayout.WEST, btnPreview, 0, SpringLayout.WEST, lblHelpText);
 		btnPreview.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
 				preview();
@@ -105,8 +82,8 @@ public class BinaryDetectorConfigurationPanel extends ConfigurationPanel {
 		add(btnPreview);
 		
 		JLabel lblSegmentInChannel = new JLabel( "Segment in channel:" );
-		springLayout.putConstraint(SpringLayout.SOUTH, lblSegmentInChannel, -276, SpringLayout.SOUTH, this);
-		springLayout.putConstraint(SpringLayout.NORTH, btnPreview, 13, SpringLayout.SOUTH, lblSegmentInChannel);
+		springLayout.putConstraint(SpringLayout.SOUTH, lblSegmentInChannel, -275, SpringLayout.SOUTH, this);
+		springLayout.putConstraint(SpringLayout.NORTH, btnPreview, 22, SpringLayout.SOUTH, lblSegmentInChannel);
 		springLayout.putConstraint(SpringLayout.WEST, lblSegmentInChannel, 0, SpringLayout.WEST, lblHelpText);
 		springLayout.putConstraint( SpringLayout.EAST, lblSegmentInChannel, 116, SpringLayout.WEST, this );
 		lblSegmentInChannel.setFont( SMALL_FONT );
@@ -114,31 +91,57 @@ public class BinaryDetectorConfigurationPanel extends ConfigurationPanel {
 		
 		final JLabel labelChannel= new JLabel( "1" );
 		springLayout.putConstraint(SpringLayout.NORTH, labelChannel, 0, SpringLayout.NORTH, lblSegmentInChannel);
-		springLayout.putConstraint(SpringLayout.EAST, labelChannel, -65, SpringLayout.EAST, this);
+		springLayout.putConstraint(SpringLayout.EAST, labelChannel, -64, SpringLayout.EAST, this);
 		labelChannel.setHorizontalAlignment( SwingConstants.CENTER );
 		labelChannel.setFont( SMALL_FONT );
 		add( labelChannel );
-
+		
+		JLabelLogger labelLogger = new JLabelLogger();
+		springLayout.putConstraint(SpringLayout.NORTH, labelLogger, 167, SpringLayout.NORTH, this);
+		springLayout.putConstraint(SpringLayout.WEST, labelLogger, 0, SpringLayout.WEST, lblHelpText);
+		add(labelLogger);
+		
+		JLabel lblMinimumSize = new JLabel("Minimum Size");
+		springLayout.putConstraint(SpringLayout.WEST, lblMinimumSize, 0, SpringLayout.WEST, lblHelpText);
+		springLayout.putConstraint(SpringLayout.SOUTH, lblMinimumSize, -22, SpringLayout.NORTH, lblMaximumSize);
+		lblMinimumSize.setFont(new Font("Arial", Font.PLAIN, 10));
+		add(lblMinimumSize);
+		
+		textFieldMin = new JTextField();
+		springLayout.putConstraint(SpringLayout.WEST, textFieldMin, 29, SpringLayout.EAST, lblMinimumSize);
+		textFieldMin.setFont(FONT);
+		textFieldMin.setHorizontalAlignment(SwingConstants.TRAILING);
+		textFieldMin.setText("10");
+		add(textFieldMin);
+		textFieldMin.setColumns(10);
+		
+		textFieldMax = new JTextField();
+		springLayout.putConstraint(SpringLayout.SOUTH, textFieldMin, -10, SpringLayout.NORTH, textFieldMax);
+		springLayout.putConstraint(SpringLayout.EAST, textFieldMin, 0, SpringLayout.EAST, textFieldMax);
+		springLayout.putConstraint(SpringLayout.EAST, textFieldMax, -132, SpringLayout.EAST, this);
+		textFieldMax.setFont(FONT);
+		textFieldMax.setHorizontalAlignment(SwingConstants.TRAILING);
+		springLayout.putConstraint(SpringLayout.NORTH, textFieldMax, 91, SpringLayout.SOUTH, lblSettings);
+		springLayout.putConstraint(SpringLayout.WEST, textFieldMax, 26, SpringLayout.EAST, lblMaximumSize);
+		textFieldMax.setText("10000");
+		add(textFieldMax);
+		textFieldMax.setColumns(10);
+		
 		sliderChannel = new JSlider();
-		springLayout.putConstraint(SpringLayout.WEST, labelChannel, 6, SpringLayout.EAST, sliderChannel);
-		springLayout.putConstraint(SpringLayout.NORTH, sliderChannel, 6, SpringLayout.SOUTH, textFieldMax);
-		springLayout.putConstraint(SpringLayout.WEST, sliderChannel, 11, SpringLayout.EAST, lblSegmentInChannel);
-		springLayout.putConstraint(SpringLayout.EAST, sliderChannel, -99, SpringLayout.EAST, this);
-		sliderChannel.addChangeListener( new ChangeListener(){
-			@Override
-			public void stateChanged( final ChangeEvent e )
-			{
+		sliderChannel.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent arg0) {
 				labelChannel.setText( "" + sliderChannel.getValue() );
 			}
-		} );
-		add( sliderChannel );
+		});
+		springLayout.putConstraint(SpringLayout.NORTH, sliderChannel, 21, SpringLayout.SOUTH, textFieldMax);
+		springLayout.putConstraint(SpringLayout.WEST, labelChannel, 15, SpringLayout.EAST, sliderChannel);
+		springLayout.putConstraint(SpringLayout.WEST, sliderChannel, 11, SpringLayout.EAST, lblSegmentInChannel);
+		springLayout.putConstraint(SpringLayout.EAST, sliderChannel, 77, SpringLayout.EAST, lblSegmentInChannel);
+		add(sliderChannel);
 		
 		// Deal with channels: the slider and channel labels are only
 		// visible if we find more than one channel.
 		final int n_channels = imp.getNChannels();
-		sliderChannel.setMaximum( n_channels );
-		sliderChannel.setMinimum( 1 );
-		sliderChannel.setValue( imp.getChannel() );
 
 		if ( n_channels <= 1 ){
 			labelChannel.setVisible( false );
@@ -149,28 +152,22 @@ public class BinaryDetectorConfigurationPanel extends ConfigurationPanel {
 			lblSegmentInChannel.setVisible( true );
 			sliderChannel.setVisible( true );
 		}
-		
-		JLabelLogger labelLogger = new JLabelLogger();
-		springLayout.putConstraint(SpringLayout.SOUTH, sliderChannel, 14, SpringLayout.SOUTH, labelLogger);
-		springLayout.putConstraint(SpringLayout.NORTH, labelLogger, 30, SpringLayout.SOUTH, textFieldMax);
-		springLayout.putConstraint(SpringLayout.WEST, labelLogger, 0, SpringLayout.WEST, lblHelpText);
-		add(labelLogger);
 		localLogger = labelLogger.getLogger();
 	}
 
 	private static final long serialVersionUID = 1L;
+	private JButton btnPreview;
 	private JTextField textFieldMin;
 	private JTextField textFieldMax;
-	private JButton btnPreview;
 	private JSlider sliderChannel;
 
 	@Override
 	public Map<String, Object> getSettings() {
-		final HashMap< String, Object > settings = new HashMap< String, Object >( 2 );
-		settings.put( KEY_MIN, NumberParser.parseInteger( textFieldMin.getText() ) );
-		settings.put( KEY_MAX, NumberParser.parseInteger( textFieldMax.getText() ) );
-		settings.put( KEY_TARGET_CHANNEL, sliderChannel.getValue() );
+		final HashMap< String, Object > settings = new HashMap< String, Object >( 4 );
 		settings.put( KEY_OPTIONS, options);
+		settings.put( KEY_MIN, NumberParser.parseInteger(textFieldMin.getText()));
+		settings.put( KEY_MAX, NumberParser.parseInteger(textFieldMax.getText()));
+		settings.put( KEY_TARGET_CHANNEL, sliderChannel.getValue());
 		return settings;
 	}
 
@@ -204,8 +201,7 @@ public class BinaryDetectorConfigurationPanel extends ConfigurationPanel {
 		new Thread( "TrackMate preview detection thread" )
 		{
 			@Override
-			public void run()
-			{
+			public void run(){
 				final Settings settings = new Settings();
 				settings.setFrom( imp );
 				final int frame = imp.getFrame() - 1;
@@ -219,8 +215,7 @@ public class BinaryDetectorConfigurationPanel extends ConfigurationPanel {
 				trackmate.getModel().setLogger( localLogger );
 
 				final boolean detectionOk = trackmate.execDetection();
-				if ( !detectionOk )
-				{
+				if ( !detectionOk ){
 					localLogger.error( trackmate.getErrorMessage() );
 					return;
 				}
@@ -230,23 +225,24 @@ public class BinaryDetectorConfigurationPanel extends ConfigurationPanel {
 				final SpotCollection newspots = trackmate.getModel().getSpots();
 				final Iterator< Spot > it = newspots.iterator( frame, false );
 				final ArrayList< Spot > spotsToCopy = new ArrayList< Spot >( newspots.getNSpots( frame, false ) );
-				while ( it.hasNext() )
-				{
+				while ( it.hasNext() ){
 					spotsToCopy.add( it.next() );
 				}
 				// Pass new spot list to model.
 				model.getSpots().put( frame, spotsToCopy );
 				// Make them visible
-				for ( final Spot spot : spotsToCopy )
-				{
+				for ( final Spot spot : spotsToCopy ){
 					spot.putFeature( SpotCollection.VISIBLITY, SpotCollection.ONE );
 				}
 				// Generate event for listener to reflect changes.
 				model.setSpots( model.getSpots(), true );
 
 				btnPreview.setEnabled( true );
-
 			};
 		}.start();
+	}
+
+	@Override
+	public void clean() {		
 	}
 }

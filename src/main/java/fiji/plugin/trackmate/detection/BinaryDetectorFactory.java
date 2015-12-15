@@ -32,7 +32,6 @@ import net.imglib2.type.numeric.RealType;
 import net.imglib2.view.Views;
 
 @Plugin( type = SpotDetectorFactory.class )
-@SuppressWarnings("deprecation")
 public class BinaryDetectorFactory<T extends RealType< T > & NativeType< T >> implements SpotDetectorFactory<T> {
 
 	/** A string key identifying this factory. */
@@ -120,7 +119,13 @@ public class BinaryDetectorFactory<T extends RealType< T > & NativeType< T >> im
 		final Integer max = ( Integer ) settings.get( KEY_MAX );
 		final Integer options = ( Integer ) settings.get( KEY_OPTIONS );
 
-		final Integer measurements = Analyzer.getMeasurements();
+		Integer measurements = Analyzer.getMeasurements();
+		if ((measurements & Analyzer.FERET) == 0) 
+			measurements = measurements | Analyzer.FERET;
+		if ((measurements & Analyzer.CIRCULARITY) == 0) 
+			measurements = measurements | Analyzer.CIRCULARITY;
+		if ((measurements & Analyzer.CENTER_OF_MASS) == 0) 
+			measurements = measurements | Analyzer.CENTER_OF_MASS;
 		final RandomAccessibleInterval< T > imFrame = prepareFrameImg( frame );
 		
 		final BinaryDetector<T> detector = new BinaryDetector<T>(imFrame, min, max, options, measurements);

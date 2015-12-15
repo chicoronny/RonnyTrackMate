@@ -203,4 +203,9 @@ public class LinearTrackerSettingsPanel extends ConfigurationPanel {
 	settings.put(KEY_ESTIMATE_RADIUS, chckbxEstimateRadius.isSelected());
 	return settings;
     }
+
+	@Override
+	public void clean() {
+		
+	}
 }

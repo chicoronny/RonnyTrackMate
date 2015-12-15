@@ -81,11 +81,11 @@ public class RadiusNeighborFlagSearchOnKDTree implements RadiusNeighborSearch<Fl
 		//
 	    final double qualityDiff =  Math.abs(currentSpot.getFeature(Spot.QUALITY).floatValue() - quality);
 	    // same factor as in LAP tracker
-	    final double spotRadiusDiff = 1 + Math.abs(currentSpot.getFeature(Spot.RADIUS).floatValue() - spotRadius) * 6d; 
+	    final double spotRadiusDiff = 1 + Math.abs(currentSpot.getFeature(Spot.RADIUS).floatValue() - spotRadius) * 3d; 
 	    // include angle into cost function with calculation of actual vector from the current position to the old found position
-	    final double angle = LTUtils.angleFromVectors(longVector, LTUtils.Subtract(currentPos, oldCoords)) / 2; 
+	    final double angle = LTUtils.angleFromVectors(longVector, LTUtils.Subtract(currentPos, oldCoords)); 
 	    // set score
-	    final double cost = squDistance/4 + spotRadiusDiff + qualityDiff/4 + angle;
+	    final double cost = squDistance/8 + spotRadiusDiff + qualityDiff/4 + angle;
 	    // set maximal cost
 	    if (cost < maxCost) 
 	    	resultPoints.add(new ValuePair<KDTreeNode<FlagNode<Spot>>, Double>(current, cost));
