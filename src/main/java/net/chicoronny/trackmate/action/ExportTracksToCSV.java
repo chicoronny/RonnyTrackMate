@@ -116,7 +116,7 @@ public class ExportTracksToCSV extends AbstractTMAction {
 		try {
 		    filename = trackmate.getSettings().imageFileName;
 		    filename = filename.substring(0, filename.indexOf("."));
-		    filename = folder.getPath() + File.separator + filename  + "_Tracks.csv";
+		    filename = folder.getPath() + File.separator + filename  + ".csv";
 		} catch (final NullPointerException npe) {
 		    filename = folder.getPath() + File.separator + "Tracks.csv";
 		}
@@ -126,7 +126,7 @@ public class ExportTracksToCSV extends AbstractTMAction {
 		
 		if (fileName.isEmpty()) return;
 		
-		File fileTracks = new File(sd.getDirectory() + fileName); 
+		File fileTracks = new File(sd.getDirectory() + fileName.substring(0, fileName.length()-4) + "_tracks.csv"); 
 		File fileSpots  = new File(sd.getDirectory() + fileName.substring(0, fileName.length()-4) + "_spots.csv");
 		
 		if (fileTracks.delete())
@@ -177,6 +177,7 @@ public class ExportTracksToCSV extends AbstractTMAction {
 			    	Spot_String += String.format(Locale.US, "%d, ", spot.ID());
 			    	for ( final String feature : spotFeatures ){
 			    		Number value = spot.getFeature(feature);
+			    		if (value==null) continue;
 			    		Spot_String += String.format(Locale.US, "%.4f, ", value.floatValue());
 			    	}
 			    	Spot_String = Spot_String.substring(0, Spot_String.length()-2) + "\n";
