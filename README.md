@@ -3,7 +3,7 @@ RonnyTrackMate
 
 - Linear Tracker for TrackMate
 
- 1. Link and set a flag for all objects that are sticking more than 90% of the time lapse movie, i.e not moving within a preset radius (Stick radius)
+ 1. Link and set a flag for all objects that are sticking more than 80% of the time lapse movie, i.e not moving within a preset radius (Stick radius)
  
  2. Establish a first possible link from an object from the first frame with an object in the second frame within an initial radius
  
