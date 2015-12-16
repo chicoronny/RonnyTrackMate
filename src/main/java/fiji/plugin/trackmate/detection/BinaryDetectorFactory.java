@@ -124,6 +124,7 @@ public class BinaryDetectorFactory<T extends RealType< T > & NativeType< T >> im
 		settings.put( KEY_MAX, DEFAULT_MAX );
 		settings.put( KEY_CIRC_MAX, DEFAULT_CIRC_MAX );
 		settings.put( KEY_CIRC_MIN, DEFAULT_CIRC_MIN );
+		settings.put( KEY_OPTIONS, DEFAULT_OPTIONS);
 		return settings;
 	}
 
