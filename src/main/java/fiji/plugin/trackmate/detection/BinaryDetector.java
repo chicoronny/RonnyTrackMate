@@ -30,12 +30,16 @@ public class BinaryDetector<T extends RealType< T > & NativeType< T >> implement
 	private int maxSize;
 	private int options;
 	private int measurements;
+	private double circMin;
+	private double circMax;
 
-	public BinaryDetector(final RandomAccessibleInterval<T> img, final int minSize, final int maxSize, final int options, final int measurements) {
+	public BinaryDetector(final RandomAccessibleInterval<T> img, final int minSize, final int maxSize, final double circMin, final double circMax, final int options, final int measurements) {
 		this.imp = ImageJFunctions.wrap(img, "");
 		this.ip = imp.getProcessor();
 		this.minSize = minSize;
 		this.maxSize = maxSize;
+		this.circMin = circMin;
+		this.circMax = circMax;
 		this.options = options;
 		this.measurements = measurements;
 	}
@@ -65,7 +69,7 @@ public class BinaryDetector<T extends RealType< T > & NativeType< T >> implement
 		if (!ip.isInvertedLut()) 
 			ip.invertLut();
 		final ResultsTable results = new ResultsTable();
-		final ParticleAnalyzer analyzer = new ParticleAnalyzer(options, measurements, results, minSize, maxSize);
+		final ParticleAnalyzer analyzer = new ParticleAnalyzer(options, measurements, results, minSize, maxSize, circMin, circMax);
 		analyzer.setHideOutputImage(true);
 		analyzer.analyze(imp, ip);
 		ResultsTableToSpots(results);

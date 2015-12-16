@@ -10,6 +10,7 @@ import static fiji.plugin.trackmate.util.TMUtils.checkParameter;
 import ij.ImagePlus;
 import ij.plugin.filter.Analyzer;
 import ij.plugin.filter.ParticleAnalyzer;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -48,12 +49,20 @@ public class BinaryDetectorFactory<T extends RealType< T > & NativeType< T >> im
 	public static final String KEY_MAX = "KEY_MAX";
 
 	public static final String KEY_OPTIONS = "KEY_OPTIONS";
+	
+	public static final String KEY_CIRC_MIN = "CIRC_MIN";
+	
+	public static final String KEY_CIRC_MAX = "CIRC_MAX";
 
 	public static final int DEFAULT_MIN = 10;
 
 	public static final int DEFAULT_MAX = 10000;
 
 	public static final int DEFAULT_OPTIONS = ParticleAnalyzer.CLEAR_WORKSHEET | ParticleAnalyzer.EXCLUDE_EDGE_PARTICLES | ParticleAnalyzer.INCLUDE_HOLES;
+
+	private static final double DEFAULT_CIRC_MAX = 1d;
+
+	private static final double DEFAULT_CIRC_MIN = 0d;
 
 	protected ImgPlus<T> img;
 
@@ -91,11 +100,15 @@ public class BinaryDetectorFactory<T extends RealType< T > & NativeType< T >> im
 		ok = ok & checkParameter( settings, KEY_MIN, Integer.class, errorHolder );
 		ok = ok & checkParameter( settings, KEY_MAX, Integer.class, errorHolder );
 		ok = ok & checkParameter( settings, KEY_OPTIONS, Integer.class, errorHolder );
+		ok = ok & checkParameter( settings, KEY_CIRC_MAX, Double.class, errorHolder );
+		ok = ok & checkParameter( settings, KEY_CIRC_MIN, Double.class, errorHolder );
 		final List< String > mandatoryKeys = new ArrayList< String >();
 		mandatoryKeys.add( KEY_TARGET_CHANNEL );
 		mandatoryKeys.add( KEY_MIN);
 		mandatoryKeys.add( KEY_MAX );
 		mandatoryKeys.add( KEY_OPTIONS );
+		mandatoryKeys.add( KEY_CIRC_MAX );
+		mandatoryKeys.add( KEY_CIRC_MIN );
 		ok = ok & checkMapKeys( settings, mandatoryKeys, null, errorHolder );
 		if ( !ok ){
 			errorMessage = errorHolder.toString();
@@ -109,7 +122,8 @@ public class BinaryDetectorFactory<T extends RealType< T > & NativeType< T >> im
 		settings.put( KEY_TARGET_CHANNEL, DEFAULT_TARGET_CHANNEL );
 		settings.put( KEY_MIN, DEFAULT_MIN );
 		settings.put( KEY_MAX, DEFAULT_MAX );
-		settings.put( KEY_OPTIONS, DEFAULT_OPTIONS );
+		settings.put( KEY_CIRC_MAX, DEFAULT_CIRC_MAX );
+		settings.put( KEY_CIRC_MIN, DEFAULT_CIRC_MIN );
 		return settings;
 	}
 
@@ -118,6 +132,8 @@ public class BinaryDetectorFactory<T extends RealType< T > & NativeType< T >> im
 		final Integer min = ( Integer ) settings.get( KEY_MIN );
 		final Integer max = ( Integer ) settings.get( KEY_MAX );
 		final Integer options = ( Integer ) settings.get( KEY_OPTIONS );
+		final Double circMin = ( Double ) settings.get( KEY_CIRC_MIN );
+		final Double circMax = ( Double ) settings.get( KEY_CIRC_MAX );
 
 		Integer measurements = Analyzer.getMeasurements();
 		if ((measurements & Analyzer.FERET) == 0) 
@@ -128,7 +144,7 @@ public class BinaryDetectorFactory<T extends RealType< T > & NativeType< T >> im
 			measurements = measurements | Analyzer.CENTER_OF_MASS;
 		final RandomAccessibleInterval< T > imFrame = prepareFrameImg( frame );
 		
-		final BinaryDetector<T> detector = new BinaryDetector<T>(imFrame, min, max, options, measurements);
+		final BinaryDetector<T> detector = new BinaryDetector<T>(imFrame, min, max, circMin, circMax, options, measurements);
 		return detector;
 	}
 

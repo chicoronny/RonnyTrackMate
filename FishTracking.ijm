@@ -27,7 +27,7 @@ run("Fill", "stack");
 run("Select None");
 setAutoThreshold("RenyiEntropy");
 run("Convert to Mask", "method=RenyiEntropy background=Light calculate");
-run("Options...", "iterations=2 count=1 do=Open stack");
+run("Options...", "iterations=4 count=2 do=Open stack");
 imageCalculator("OR create stack", title, "Left");
 selectWindow(title);
 close();
