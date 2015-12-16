@@ -16,3 +16,7 @@ RonnyTrackMate
 - Batch Mode Plug-in to run TrackMate headless from a configuration file
 
 - Binary Detector to detect objects from a binary image using the ParticleAnalyzer class from ImageJ
+
+- Export tracks to SQLite
+
+- Export tracks to CSV files
