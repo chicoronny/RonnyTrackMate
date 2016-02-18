@@ -13,7 +13,7 @@ RonnyTrackMate
 
  5. Go on to the next frame until the last is reached
 
-- Batch Mode Plug-in to run TrackMate headless from a configuration file
+- Batch Mode Plug-in to run TrackMate headless from a configuration file (example:Trackmate.properties) which has to placed    in the parent folder of the processed files
 
 - Binary Detector to detect objects from a binary image using the ParticleAnalyzer class from ImageJ
 
