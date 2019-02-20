@@ -6,6 +6,8 @@ import static net.chicoronny.trackmate.lineartracker.LinearTrackerKeys.KEY_SUCCE
 import static net.chicoronny.trackmate.lineartracker.LinearTrackerKeys.KEY_MAX_COST;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Locale;
 import java.util.Map;
 
@@ -24,6 +26,7 @@ import fiji.plugin.trackmate.features.track.TrackDurationAnalyzer;
 import fiji.plugin.trackmate.features.track.TrackLinkingAnalyzer;
 import fiji.plugin.trackmate.features.track.TrackSpeedStatisticsAnalyzer;
 import fiji.plugin.trackmate.io.TmXmlReader;
+import fiji.plugin.trackmate.io.TmXmlWriter;
 import fiji.plugin.trackmate.providers.DetectorProvider;
 import fiji.plugin.trackmate.providers.TrackerProvider;
 import fiji.plugin.trackmate.visualization.hyperstack.HyperStackDisplayer;
@@ -109,6 +112,37 @@ public class LinearTrackerTestDrive {
 	//final String newName = file.getAbsolutePath().substring(0, file.getAbsolutePath().length()-4) + "_T.db";
 	//final File _file = new File(newName);
 	//ExportTracksToSQL.export(trackmate.getModel(), settings, _file);
+	
+	File ofile = null;
+	try {
+	    ofile = new File("samples/CRTD14a.xml");
+	} catch (final NullPointerException e){
+	    System.err.println(e.getMessage());
+	    return;
+	}
+	
+	final TmXmlWriter writer = new TmXmlWriter( ofile );
+
+	//writer.appendLog( logPanel.getTextContent() );
+	writer.appendModel( trackmate.getModel() );
+	writer.appendSettings( trackmate.getSettings() );
+	//writer.appendGUIState( controller.getGuimodel() );
+	
+	try
+	{
+		writer.writeToFile();
+		System.out.println( "Data saved to: " + ofile.toString() + '\n' );
+	}
+	catch ( final FileNotFoundException e )
+	{
+		System.out.println( "File not found:\n" + e.getMessage() + '\n' );
+		return;
+	}
+	catch ( final IOException e )
+	{
+		System.out.println( "Input/Output error:\n" + e.getMessage() + '\n' );
+		return;
+	}
 	
 	final ExportTracksToSQL ex = new ExportTracksToSQL();
 	ex.execute(trackmate);
