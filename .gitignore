@@ -13,3 +13,6 @@ hs_err_pid*
 target/classes
 target/META-INF/
 target/maven-archiver/
+
+.idea/
+.settings/
