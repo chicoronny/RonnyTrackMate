@@ -289,7 +289,7 @@ public class LinearTracker implements SpotTracker, MultiThreaded
 																			
 					if (lsearch.numNeighbors() < 1) {
 						if (Run < MAX_GAP) { // automatic gap handling
-							// estim = LTUtils.Add(estim, preVector);
+							//estim = LTUtils.Add(estim, preVector);
 							Run++;
 							succFrame++;
 							count++;

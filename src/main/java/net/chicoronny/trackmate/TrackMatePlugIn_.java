@@ -131,6 +131,7 @@ public class TrackMatePlugIn_ implements PlugIn
 
 	/**
 	 * @param args
+	 * 			program arguments
 	 */
 	public static void main( final String[] args )
 	{

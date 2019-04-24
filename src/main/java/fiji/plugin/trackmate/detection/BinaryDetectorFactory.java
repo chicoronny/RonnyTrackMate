@@ -143,6 +143,8 @@ public class BinaryDetectorFactory<T extends RealType< T > & NativeType< T >> im
 			measurements = measurements | Analyzer.CIRCULARITY;
 		if ((measurements & Analyzer.CENTER_OF_MASS) == 0) 
 			measurements = measurements | Analyzer.CENTER_OF_MASS;
+		if ((measurements & Analyzer.MIN_MAX) == 0)
+			measurements = measurements | Analyzer.MIN_MAX;
 		final RandomAccessibleInterval< T > imFrame = prepareFrameImg( frame );
 		
 		final BinaryDetector<T> detector = new BinaryDetector<T>(imFrame, min, max, circMin, circMax, options, measurements);

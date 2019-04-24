@@ -62,7 +62,7 @@ public class LinearTrackerTestDrive {
 		settings.trackerFactory = tp.getFactory( LinearTrackerFactory.TRACKER_KEY );
 	final Map<String, Object> ts = settings.trackerFactory.getDefaultSettings();
 	ts.put(KEY_INITIAL_DISTANCE, 2.5d);
-	ts.put(KEY_SUCCEEDING_DISTANCE, 2.0d);
+	ts.put(KEY_SUCCEEDING_DISTANCE, 3.0d);
 	ts.put(KEY_STICK_RADIUS, 0.9d);
 	ts.put(KEY_MAX_COST, 90d);
 	settings.trackerSettings = ts;
@@ -150,7 +150,6 @@ public class LinearTrackerTestDrive {
 	final SelectionModel sm = new SelectionModel( model );
 	final HyperStackDisplayer view = new HyperStackDisplayer( model, sm );
 	view.render();
-	
 	Locale.setDefault(curlocale);
     }
 

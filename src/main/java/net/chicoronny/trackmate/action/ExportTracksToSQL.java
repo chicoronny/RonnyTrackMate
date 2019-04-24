@@ -112,12 +112,13 @@ public class ExportTracksToSQL extends AbstractTMAction {
 	} catch (final NullPointerException npe) {
 	    filename = folder.getPath() + File.separator + "Tracks.db";
 	}
-	SaveDialog sd = new SaveDialog("Save Database File", filename, ".db");
+	final SaveDialog sd = new SaveDialog("Save Database File", filename, ".db");
+	
 	String fileName = sd.getFileName();
 	
-	if (fileName.isEmpty()) return;
+	if (fileName == null || fileName.isEmpty()) return;
 	
-	File file = new File(sd.getDirectory() + fileName); 
+	final File file = new File(sd.getDirectory() + fileName); 
 	
 	if (file.delete())
 		logger.log("File will be overwritten!\n");

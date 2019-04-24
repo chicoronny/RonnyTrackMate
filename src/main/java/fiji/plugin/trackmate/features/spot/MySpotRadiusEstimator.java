@@ -27,6 +27,10 @@ public class MySpotRadiusEstimator< T extends RealType< T >> extends Independent
 	 * <code>diameter</code> * {@value #MIN_DIAMETER_RATIO} and
 	 * <code>diameter</code> * {@value #MAX_DIAMETER_RATIO}. The optimum is them
 	 * calculated by doing an interpolation over calculated values.
+	 * @param img
+     *            image handle
+     * @param spots
+     *            spot list
 	 */
 	public MySpotRadiusEstimator( final ImgPlus<T> img, final Iterator< Spot > spots ){
 		super( img, spots );
