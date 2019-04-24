@@ -66,7 +66,7 @@ public class BinaryDetector<T extends RealType< T > & NativeType< T >> implement
 	@Override
 	public boolean process() {
 		final long start = System.currentTimeMillis();
-		if (!ip.isInvertedLut()) 
+		if (!ip.isInvertedLut())
 			ip.invertLut();
 		final ResultsTable results = new ResultsTable();
 		final ParticleAnalyzer analyzer = new ParticleAnalyzer(options, measurements, results, minSize, maxSize, circMin, circMax);
