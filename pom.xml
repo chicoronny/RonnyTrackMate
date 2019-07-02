@@ -10,7 +10,7 @@
 
 
 	<artifactId>RonnyTrackMate_</artifactId>
-	<version>0.0.5-SNAPSHOT</version>
+	<version>0.0.6-SNAPSHOT</version>
 	<name>plugins/RonnyTrackMate_.jar</name>
 
 	<description>A Maven project with the bare structure to hold TrackMate modules.</description>
@@ -67,6 +67,14 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>ome</groupId>
+			<artifactId>bio-formats_plugins</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>ome</groupId>
+			<artifactId>formats-api</artifactId>
 		</dependency>
 	</dependencies>
 	

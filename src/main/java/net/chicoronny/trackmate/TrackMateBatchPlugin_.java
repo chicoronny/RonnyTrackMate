@@ -20,6 +20,8 @@ import ij.ImageJ;
 import ij.ImagePlus;
 import ij.io.DirectoryChooser;
 import ij.plugin.PlugIn;
+import loci.formats.FormatException;
+import loci.plugins.BF;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -268,6 +270,10 @@ public class TrackMateBatchPlugin_ implements PlugIn
 		{
 			logger.log( e2.getMessage() );
 		}
+		catch ( final FormatException e3 )
+		{
+			logger.log( e3.getMessage() );
+		}
 		Locale.setDefault( curLocale );
 	}
 
@@ -280,8 +286,9 @@ public class TrackMateBatchPlugin_ implements PlugIn
 	 *             the file not found exception
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
+	 * @throws FormatException 
 	 */
-	private void process( final File folder ) throws IOException
+	private void process( final File folder ) throws IOException, FormatException
 	{
 	// get the directory to work on
 
@@ -292,7 +299,9 @@ public class TrackMateBatchPlugin_ implements PlugIn
 	
 	for (final File file : fList) {
 	    logger.log("Processing " + file.getName());
-	    final ImagePlus imp = new ImagePlus(file.getAbsolutePath());
+	    //final ImagePlus imp = new ImagePlus(file.getAbsolutePath());
+	    final ImagePlus[] imps = BF.openImagePlus(file.getAbsolutePath());
+	    final ImagePlus imp = imps[0]; //only one image per file so far;
 	    final Settings settings = new Settings();
 //	    settings.setFromWithoutROI(imp);
 			imp.killRoi();
