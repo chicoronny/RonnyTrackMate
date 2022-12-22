@@ -25,6 +25,7 @@ import fiji.plugin.trackmate.features.spot.MySpotRadiusEstimatorFactory;
 import fiji.plugin.trackmate.features.track.TrackDurationAnalyzer;
 import fiji.plugin.trackmate.features.track.TrackLinkingAnalyzer;
 import fiji.plugin.trackmate.features.track.TrackSpeedStatisticsAnalyzer;
+import fiji.plugin.trackmate.gui.displaysettings.DisplaySettings;
 import fiji.plugin.trackmate.io.TmXmlReader;
 import fiji.plugin.trackmate.io.TmXmlWriter;
 import fiji.plugin.trackmate.providers.DetectorProvider;
@@ -49,8 +50,7 @@ public class LinearTrackerTestDrive {
 	System.out.println("Opening file: " + file.getAbsolutePath());
 	final TmXmlReader reader = new TmXmlReader(file);
 	final Model model = reader.getModel();
-	final Settings settings = new Settings();
-	reader.readSettings(settings, new DetectorProvider(), new TrackerProvider(), null, null, null);
+	final Settings settings = reader.readSettings(null, new DetectorProvider(), new TrackerProvider(), null, null, null, null);
 
 	final SpotCollection spots = model.getSpots();
 	System.out.println("Spots: " + spots);
@@ -144,11 +144,14 @@ public class LinearTrackerTestDrive {
 		return;
 	}
 	
-	final ExportTracksToSQL ex = new ExportTracksToSQL();
-	ex.execute(trackmate);
+	final DisplaySettings displaySettings = DisplaySettings.defaultStyle().copy();
 	
+	final ExportTracksToSQL ex = new ExportTracksToSQL();
 	final SelectionModel sm = new SelectionModel( model );
-	final HyperStackDisplayer view = new HyperStackDisplayer( model, sm );
+	
+	ex.execute(trackmate, sm, displaySettings, null);
+	
+	final HyperStackDisplayer view = new HyperStackDisplayer( model, sm, displaySettings );
 	view.render();
 	Locale.setDefault(curlocale);
     }

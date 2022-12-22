@@ -1,23 +1,23 @@
 package fiji.plugin.trackmate.features.spot;
 
-import static fiji.plugin.trackmate.features.spot.SpotRadiusEstimatorFactory.ESTIMATED_DIAMETER;
-
-import java.util.Iterator;
-
 import net.imagej.ImgPlus;
 import net.imglib2.type.numeric.RealType;
 import fiji.plugin.trackmate.Spot;
 import fiji.plugin.trackmate.util.SpotNeighborhood;
 import fiji.plugin.trackmate.util.SpotNeighborhoodCursor;
 
-public class MySpotRadiusEstimator< T extends RealType< T >> extends IndependentSpotFeatureAnalyzer< T >{
+public class MySpotRadiusEstimator< T extends RealType< T >> extends AbstractSpotFeatureAnalyzer< T >{
 
 	private static final double MIN_DIAMETER_RATIO = 0.02f;
 
 	private static final double MAX_DIAMETER_RATIO = 10;
+	
+	public static final String ESTIMATED_DIAMETER = "ESTIMATED_DIAMETER";
 
 	/** The number of different diameters to try. */
 	protected int nDiameters = 50;
+	
+	protected final ImgPlus< T > img;
 
 	/**
 	 * Create a feature analyzer that will return the best estimated diameter
@@ -32,8 +32,8 @@ public class MySpotRadiusEstimator< T extends RealType< T >> extends Independent
      * @param spots
      *            spot list
 	 */
-	public MySpotRadiusEstimator( final ImgPlus<T> img, final Iterator< Spot > spots ){
-		super( img, spots );
+	public MySpotRadiusEstimator( final ImgPlus<T> img ){
+		this.img = img;
 	}
 
 	@Override

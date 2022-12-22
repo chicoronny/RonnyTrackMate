@@ -49,14 +49,14 @@ import fiji.plugin.trackmate.detection.LogDetectorFactory;
 import fiji.plugin.trackmate.features.FeatureFilter;
 import fiji.plugin.trackmate.features.edges.EdgeAnalyzer;
 import fiji.plugin.trackmate.features.spot.SpotAnalyzerFactory;
+import fiji.plugin.trackmate.features.spot.SpotAnalyzerFactoryBase;
 import fiji.plugin.trackmate.features.track.TrackAnalyzer;
 import fiji.plugin.trackmate.providers.DetectorProvider;
 import fiji.plugin.trackmate.providers.TrackerProvider;
-import fiji.plugin.trackmate.tracking.oldlap.FastLAPTrackerFactory;
-import fiji.plugin.trackmate.tracking.oldlap.LAPTrackerFactory;
-import fiji.plugin.trackmate.tracking.oldlap.SimpleFastLAPTrackerFactory;
-import fiji.plugin.trackmate.tracking.oldlap.SimpleLAPTrackerFactory;
+
 import fiji.plugin.trackmate.tracking.sparselap.SparseLAPTrackerFactory;
+import fiji.plugin.trackmate.tracking.kalman.KalmanTrackerFactory;
+import fiji.plugin.trackmate.tracking.sparselap.SimpleSparseLAPTrackerFactory;
 
 /**
  * The Class TrackMateBatchPlugin_.
@@ -302,10 +302,9 @@ public class TrackMateBatchPlugin_ implements PlugIn
 	    //final ImagePlus imp = new ImagePlus(file.getAbsolutePath());
 	    final ImagePlus[] imps = BF.openImagePlus(file.getAbsolutePath());
 	    final ImagePlus imp = imps[0]; //only one image per file so far;
-	    final Settings settings = new Settings();
+	    final Settings settings = new Settings(imp);
 //	    settings.setFromWithoutROI(imp);
-			imp.killRoi();
-			settings.setFrom( imp );
+		imp.killRoi();
 
 	    // Detection
 	    final DetectorProvider provider = new DetectorProvider();
@@ -334,40 +333,16 @@ public class TrackMateBatchPlugin_ implements PlugIn
 	    	    ts.put(KEY_STICK_RADIUS, STICK_RADIUS);
 	    	    ts.put(KEY_MAX_COST, MAX_COST);
 	    	    settings.trackerSettings = ts; }
-		else if(TRACKER.startsWith("FAST_LAP_TRACKER")) {
-	    	    settings.trackerFactory = tp.getFactory( FastLAPTrackerFactory.TRACKER_KEY );
-	    	    final Map<String, Object> fl = settings.trackerFactory.getDefaultSettings();
-	    	    fl.put(KEY_ALLOW_GAP_CLOSING, ALLOW_GAP_CLOSING);
-	    	    fl.put(KEY_ALLOW_TRACK_MERGING, ALLOW_TRACK_MERGING);
-	    	    fl.put(KEY_ALLOW_TRACK_SPLITTING, ALLOW_TRACK_SPLITTING);
-	    	    fl.put(KEY_GAP_CLOSING_MAX_DISTANCE, GAP_CLOSING_MAX_DISTANCE);
-	    	    fl.put(KEY_GAP_CLOSING_MAX_FRAME_GAP, GAP_CLOSING_MAX_FRAME_GAP );
-	    	    fl.put(KEY_LINKING_MAX_DISTANCE, LINKING_MAX_DISTANCE);
-	    	    fl.put(KEY_MERGING_MAX_DISTANCE, MERGING_MAX_DISTANCE);
-	    	    fl.put(KEY_SPLITTING_MAX_DISTANCE, SPLITTING_MAX_DISTANCE);
-	    	    settings.trackerSettings = fl; }
 		else if(TRACKER.startsWith("SIMPLE_FAST_LAP_TRACKER")) {    
-	    	    settings.trackerFactory = tp.getFactory( SimpleFastLAPTrackerFactory.TRACKER_KEY );
+	    	    settings.trackerFactory = tp.getFactory( SimpleSparseLAPTrackerFactory.THIS_TRACKER_KEY);
 	    	    final Map<String, Object> sfl = settings.trackerFactory.getDefaultSettings();
 	    	    sfl.put(KEY_ALLOW_GAP_CLOSING, ALLOW_GAP_CLOSING);
 	    	    sfl.put(KEY_GAP_CLOSING_MAX_DISTANCE, GAP_CLOSING_MAX_DISTANCE);
 	    	    sfl.put(KEY_GAP_CLOSING_MAX_FRAME_GAP, GAP_CLOSING_MAX_FRAME_GAP );
 	    	    sfl.put(KEY_LINKING_MAX_DISTANCE, LINKING_MAX_DISTANCE);
 	    	    settings.trackerSettings = sfl; }
-		else if (TRACKER.startsWith("LAP_TRACKER")){
-	    	    settings.trackerFactory = tp.getFactory( LAPTrackerFactory.TRACKER_KEY );
-	    	    final Map<String, Object> l = settings.trackerFactory.getDefaultSettings();
-	    	    l.put(KEY_ALLOW_GAP_CLOSING, ALLOW_GAP_CLOSING);
-	    	    l.put(KEY_ALLOW_TRACK_MERGING, ALLOW_TRACK_MERGING);
-	    	    l.put(KEY_ALLOW_TRACK_SPLITTING, ALLOW_TRACK_SPLITTING);
-	    	    l.put(KEY_GAP_CLOSING_MAX_DISTANCE, GAP_CLOSING_MAX_DISTANCE);
-	    	    l.put(KEY_GAP_CLOSING_MAX_FRAME_GAP, GAP_CLOSING_MAX_FRAME_GAP );
-	    	    l.put(KEY_LINKING_MAX_DISTANCE, LINKING_MAX_DISTANCE);
-	    	    l.put(KEY_MERGING_MAX_DISTANCE, MERGING_MAX_DISTANCE);
-	    	    l.put(KEY_SPLITTING_MAX_DISTANCE, SPLITTING_MAX_DISTANCE);
-	    	    settings.trackerSettings = l; }
 		else if (TRACKER.startsWith("SPARSE_LAP_TRACKER")) {
-	    	    settings.trackerFactory = tp.getFactory( SparseLAPTrackerFactory.TRACKER_KEY );
+	    	    settings.trackerFactory = tp.getFactory( SparseLAPTrackerFactory.THIS_TRACKER_KEY );
 	    	    final Map<String, Object> slp = settings.trackerFactory.getDefaultSettings();
 	    	    slp.put(KEY_ALLOW_GAP_CLOSING, ALLOW_GAP_CLOSING);
 	    	    slp.put(KEY_ALLOW_TRACK_MERGING, ALLOW_TRACK_MERGING);
@@ -378,16 +353,8 @@ public class TrackMateBatchPlugin_ implements PlugIn
 	    	    slp.put(KEY_MERGING_MAX_DISTANCE, MERGING_MAX_DISTANCE);
 	    	    slp.put(KEY_SPLITTING_MAX_DISTANCE, SPLITTING_MAX_DISTANCE);
 	    	    settings.trackerSettings = slp; }
-		else if(TRACKER.startsWith("SIMPLE_LAP_TRACKER")) {
-	    	    settings.trackerFactory = tp.getFactory( SimpleLAPTrackerFactory.TRACKER_KEY );
-	    	    final Map<String, Object> sl = settings.trackerFactory.getDefaultSettings();
-	    	    sl.put(KEY_ALLOW_GAP_CLOSING, ALLOW_GAP_CLOSING);
-	    	    sl.put(KEY_GAP_CLOSING_MAX_DISTANCE, GAP_CLOSING_MAX_DISTANCE);
-	    	    sl.put(KEY_GAP_CLOSING_MAX_FRAME_GAP, GAP_CLOSING_MAX_FRAME_GAP );
-	    	    sl.put(KEY_LINKING_MAX_DISTANCE, LINKING_MAX_DISTANCE);
-	    	    settings.trackerSettings = sl; }
 		else if(TRACKER.startsWith("KALMAN_TRACKER")) {
-    	    settings.trackerFactory = tp.getFactory( "KALMAN_TRACKER" );
+    	    settings.trackerFactory = tp.getFactory( KalmanTrackerFactory.KEY );
     	    final Map<String, Object> ka = settings.trackerFactory.getDefaultSettings();
     	    ka.put(KEY_KALMAN_SEARCH_RADIUS, KALMAN_SEARCH_RADIUS);
     	    ka.put(KEY_GAP_CLOSING_MAX_FRAME_GAP, GAP_CLOSING_MAX_FRAME_GAP );
@@ -448,11 +415,11 @@ public class TrackMateBatchPlugin_ implements PlugIn
 	    }	    
 
 	    // Filter with check of availability
-	    List<SpotAnalyzerFactory<?>> spotFactories = settings.getSpotAnalyzerFactories();
+	    List<SpotAnalyzerFactoryBase<?>> spotFactories = settings.getSpotAnalyzerFactories();
 	    for (ValuePair<String, Double> f:spotfilters){
 		boolean isAbove = f.getB() >= 0; 
 		final FeatureFilter filter = new FeatureFilter(f.getA(), Math.abs(f.getB()), isAbove);
-		Iterator<SpotAnalyzerFactory<?>> fIt = spotFactories.iterator();
+		Iterator<SpotAnalyzerFactoryBase<?>> fIt = spotFactories.iterator();
 		while (fIt.hasNext()){
 		    List<String> curAnalyzer = fIt.next().getFeatures();
 		    if (curAnalyzer.contains(f.getA()))

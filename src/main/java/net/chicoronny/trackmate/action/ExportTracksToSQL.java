@@ -2,6 +2,7 @@ package net.chicoronny.trackmate.action;
 
 import ij.io.SaveDialog;
 
+import java.awt.Frame;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -21,6 +22,7 @@ import org.scijava.plugin.Plugin;
 import fiji.plugin.trackmate.FeatureModel;
 import fiji.plugin.trackmate.Logger;
 import fiji.plugin.trackmate.Model;
+import fiji.plugin.trackmate.SelectionModel;
 import fiji.plugin.trackmate.Settings;
 import fiji.plugin.trackmate.Spot;
 import fiji.plugin.trackmate.TrackMate;
@@ -28,8 +30,8 @@ import fiji.plugin.trackmate.TrackModel;
 import fiji.plugin.trackmate.action.AbstractTMAction;
 import fiji.plugin.trackmate.action.TrackMateAction;
 import fiji.plugin.trackmate.action.TrackMateActionFactory;
-import fiji.plugin.trackmate.gui.TrackMateGUIController;
-import fiji.plugin.trackmate.gui.TrackMateWizard;
+import fiji.plugin.trackmate.gui.Icons;
+import fiji.plugin.trackmate.gui.displaysettings.DisplaySettings;
 
 public class ExportTracksToSQL extends AbstractTMAction {
 
@@ -45,7 +47,6 @@ public class ExportTracksToSQL extends AbstractTMAction {
 		"</html>";
     public static final String NAME= "Export tracks to SQLITE database";
     public static final String KEY = "EXPORT_TRACKS_TO_SQLITE";;
-    public static final ImageIcon ICON  = new ImageIcon(TrackMateWizard.class.getResource("images/page_save.png"));
     
     public ExportTracksToSQL()
     {
@@ -87,7 +88,7 @@ public class ExportTracksToSQL extends AbstractTMAction {
     
     
     @Override
-    public void execute(final TrackMate trackmate) {
+    public void execute(final TrackMate trackmate, SelectionModel selectionModel, DisplaySettings displaySettings, Frame parent) {
 	logger.log("Exporting tracks to SQLite database.\n");
 	final long start = System.currentTimeMillis();
 	final Model model = trackmate.getModel();
@@ -307,7 +308,7 @@ public class ExportTracksToSQL extends AbstractTMAction {
 		}
 
 		@Override
-		public TrackMateAction create( final TrackMateGUIController controller )
+		public TrackMateAction create()
 		{
 			return new ExportTracksToSQL();
 		}
@@ -315,7 +316,7 @@ public class ExportTracksToSQL extends AbstractTMAction {
 		@Override
 		public ImageIcon getIcon()
 		{
-			return ICON;
+			return Icons.APPLY_ICON;
 		}
 	}
 

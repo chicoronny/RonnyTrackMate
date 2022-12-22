@@ -1,8 +1,8 @@
 package net.chicoronny.trackmate.lineartracker;
 
-import static fiji.plugin.trackmate.gui.TrackMateWizard.BIG_FONT;
-import static fiji.plugin.trackmate.gui.TrackMateWizard.FONT;
-import static fiji.plugin.trackmate.gui.TrackMateWizard.TEXTFIELD_DIMENSION;
+import static fiji.plugin.trackmate.gui.Fonts.BIG_FONT;
+import static fiji.plugin.trackmate.gui.Fonts.FONT;
+import static fiji.plugin.trackmate.gui.Fonts.TEXTFIELD_DIMENSION;
 import static net.chicoronny.trackmate.lineartracker.LinearTrackerKeys.KEY_INITIAL_DISTANCE;
 import static net.chicoronny.trackmate.lineartracker.LinearTrackerKeys.KEY_MAX_COST;
 import static net.chicoronny.trackmate.lineartracker.LinearTrackerKeys.KEY_STICK_RADIUS;
@@ -16,10 +16,10 @@ import java.util.Map;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 
-import fiji.plugin.trackmate.gui.ConfigurationPanel;
-import fiji.plugin.trackmate.gui.panels.components.JNumericTextField;
+import fiji.plugin.trackmate.gui.components.ConfigurationPanel;
 
 import javax.swing.JCheckBox;
+import javax.swing.JFormattedTextField;
 
 /**
  * The Class linearTrackerSettingsPanel.
@@ -48,22 +48,22 @@ public class LinearTrackerSettingsPanel extends ConfigurationPanel {
     private JLabel labelUnits;
     
     /** The init dist field. */
-    private JNumericTextField initDistField;
+    private JFormattedTextField  initDistField;
     
     /** The init succ field. */
-    private JNumericTextField initSuccField;
+    private JFormattedTextField  initSuccField;
     
     /** The label unit2. */
     private JLabel labelUnit2;
 
     /** The init stick field. */
-    private JNumericTextField initStickField;
+    private JFormattedTextField  initStickField;
 
     /** The label unit3. */
     private JLabel labelUnit3;
 
     /** The max cost field. */
-    private JNumericTextField maxCostField;
+    private JFormattedTextField  maxCostField;
     private JCheckBox chckbxEstimateRadius;
 
     /**
@@ -115,7 +115,7 @@ public class LinearTrackerSettingsPanel extends ConfigurationPanel {
 	lblInitDistance.setBounds(10, 314, 164, 20);
 	add(lblInitDistance);
 
-	initDistField = new JNumericTextField();
+	initDistField = new JFormattedTextField ();
 	initDistField.setFont(FONT);
 	initDistField.setBounds(184, 316, 62, 20);
 	initDistField.setSize(TEXTFIELD_DIMENSION);
@@ -126,7 +126,7 @@ public class LinearTrackerSettingsPanel extends ConfigurationPanel {
 	lblSuccDistance.setBounds(10, 342, 164, 20);
 	add(lblSuccDistance);
 
-	initSuccField = new JNumericTextField();
+	initSuccField = new JFormattedTextField ();
 	initSuccField.setFont(FONT);
 	initSuccField.setBounds(184, 344, 62, 20);
 	initSuccField.setSize(TEXTFIELD_DIMENSION);
@@ -137,7 +137,7 @@ public class LinearTrackerSettingsPanel extends ConfigurationPanel {
 	lblStickDistance.setBounds(10, 370, 164, 20);
 	add(lblStickDistance);
 	
-	initStickField = new JNumericTextField();
+	initStickField = new JFormattedTextField ();
 	initStickField.setFont(FONT);
 	initStickField.setBounds(184, 372, 62, 20);
 	initStickField.setSize(TEXTFIELD_DIMENSION);
@@ -148,7 +148,7 @@ public class LinearTrackerSettingsPanel extends ConfigurationPanel {
 	lblMaxCost.setBounds(10, 396, 164, 20);
 	add(lblMaxCost);
 	
-	maxCostField = new JNumericTextField();
+	maxCostField = new JFormattedTextField ();
 	maxCostField.setFont(FONT);
 	maxCostField.setBounds(184, 398, 62, 20);
 	maxCostField.setSize(TEXTFIELD_DIMENSION);

@@ -1,8 +1,8 @@
 package fiji.plugin.trackmate.detection;
 
-import static fiji.plugin.trackmate.gui.TrackMateWizard.FONT;
-import static fiji.plugin.trackmate.gui.TrackMateWizard.BIG_FONT;
-import static fiji.plugin.trackmate.gui.TrackMateWizard.SMALL_FONT;
+import static fiji.plugin.trackmate.gui.Fonts.FONT;
+import static fiji.plugin.trackmate.gui.Fonts.BIG_FONT;
+import static fiji.plugin.trackmate.gui.Fonts.SMALL_FONT;
 import static fiji.plugin.trackmate.detection.BinaryDetectorFactory.KEY_MAX;
 import static fiji.plugin.trackmate.detection.BinaryDetectorFactory.KEY_MIN;
 import static fiji.plugin.trackmate.detection.BinaryDetectorFactory.KEY_OPTIONS;
@@ -22,7 +22,7 @@ import fiji.plugin.trackmate.Settings;
 import fiji.plugin.trackmate.Spot;
 import fiji.plugin.trackmate.SpotCollection;
 import fiji.plugin.trackmate.TrackMate;
-import fiji.plugin.trackmate.gui.ConfigurationPanel;
+import fiji.plugin.trackmate.gui.components.ConfigurationPanel;
 import fiji.plugin.trackmate.util.JLabelLogger;
 import fiji.util.NumberParser;
 
@@ -247,8 +247,7 @@ public class BinaryDetectorConfigurationPanel extends ConfigurationPanel {
 		{
 			@Override
 			public void run(){
-				final Settings settings = new Settings();
-				settings.setFrom( imp );
+				final Settings settings = new Settings(imp);
 				final int frame = imp.getFrame() - 1;
 				settings.tstart = frame;
 				settings.tend = frame;
@@ -277,7 +276,7 @@ public class BinaryDetectorConfigurationPanel extends ConfigurationPanel {
 				model.getSpots().put( frame, spotsToCopy );
 				// Make them visible
 				for ( final Spot spot : spotsToCopy ){
-					spot.putFeature( SpotCollection.VISIBLITY, SpotCollection.ONE );
+					spot.putFeature( SpotCollection.VISIBILITY, SpotCollection.ONE );
 				}
 				// Generate event for listener to reflect changes.
 				model.setSpots( model.getSpots(), true );

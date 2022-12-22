@@ -2,24 +2,21 @@ package fiji.plugin.trackmate.features.spot;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import javax.swing.ImageIcon;
 
 import net.imagej.ImgPlus;
-import net.imglib2.meta.view.HyperSliceImgPlus;
+import net.imagej.axis.Axes;
+import net.imglib2.img.display.imagej.ImgPlusViews;
 import net.imglib2.type.NativeType;
 import net.imglib2.type.numeric.RealType;
 
 import org.scijava.plugin.Plugin;
 
 import fiji.plugin.trackmate.Dimension;
-import fiji.plugin.trackmate.Model;
-import fiji.plugin.trackmate.Spot;
 
-@SuppressWarnings("deprecation")
 @Plugin( type = SpotAnalyzerFactory.class, priority = 0d )
 public class MySpotRadiusEstimatorFactory< T extends RealType< T > & NativeType< T >> implements SpotAnalyzerFactory< T >
 {
@@ -57,12 +54,29 @@ public class MySpotRadiusEstimatorFactory< T extends RealType< T > & NativeType<
 	 * METHODS
 	 */
 	@Override
-	public MySpotRadiusEstimator< T > getAnalyzer( final Model model, final ImgPlus< T > img, final int frame, final int channel )
+	public SpotAnalyzer<T> getAnalyzer( final ImgPlus< T > img, final int frame, final int channel )
 	{
-		final ImgPlus< T > imgC = HyperSliceImgPlus.fixChannelAxis( img, channel );
-		final ImgPlus< T > imgCT = HyperSliceImgPlus.fixTimeAxis( imgC, frame );
-		final Iterator< Spot > spots = model.getSpots().iterator( frame, false );
-		return new MySpotRadiusEstimator< T >( imgCT, spots );
+		final ImgPlus< T > imgTC = hyperSlice( img, channel, frame );
+		return new MySpotRadiusEstimator< T >( imgTC );
+	}
+
+	private ImgPlus<T> hyperSlice(ImgPlus<T> img, int channel, int frame) {
+		
+		final int timeDim = img.dimensionIndex( Axes.TIME );
+		final ImgPlus< T > imgT = timeDim < 0 ? img : ImgPlusViews.hyperSlice( img, timeDim, frame );
+
+		final int channelDim = imgT.dimensionIndex( Axes.CHANNEL );
+		final ImgPlus< T > imgTC = channelDim < 0 ? imgT : ImgPlusViews.hyperSlice( imgT, channelDim, channel );
+
+		// Squeeze Z dimension if its size is 1.
+		final int zDim = imgTC.dimensionIndex( Axes.Z );
+		final ImgPlus< T > imgTCZ;
+		if ( zDim >= 0 && imgTC.dimension( zDim ) <= 1 )
+			imgTCZ = ImgPlusViews.hyperSlice( imgTC, zDim, imgTC.min( zDim ) );
+		else
+			imgTCZ = imgTC;
+
+		return imgTCZ;
 	}
 
 	@Override

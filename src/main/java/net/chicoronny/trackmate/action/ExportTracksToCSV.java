@@ -2,6 +2,7 @@ package net.chicoronny.trackmate.action;
 
 import ij.io.SaveDialog;
 
+import java.awt.Frame;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -18,13 +19,14 @@ import javax.swing.ImageIcon;
 import org.scijava.plugin.Plugin;
 
 import fiji.plugin.trackmate.Model;
+import fiji.plugin.trackmate.SelectionModel;
 import fiji.plugin.trackmate.Spot;
 import fiji.plugin.trackmate.TrackMate;
 import fiji.plugin.trackmate.action.AbstractTMAction;
 import fiji.plugin.trackmate.action.TrackMateAction;
 import fiji.plugin.trackmate.action.TrackMateActionFactory;
-import fiji.plugin.trackmate.gui.TrackMateGUIController;
-import fiji.plugin.trackmate.gui.TrackMateWizard;
+import fiji.plugin.trackmate.gui.Icons;
+import fiji.plugin.trackmate.gui.displaysettings.DisplaySettings;
 
 public class ExportTracksToCSV extends AbstractTMAction {
 	
@@ -40,7 +42,6 @@ public class ExportTracksToCSV extends AbstractTMAction {
 		"</html>";
     public static final String NAME= "Export tracks to CSV files";
     public static final String KEY = "EXPORT_TRACKS_TO_CSV";;
-    public static final ImageIcon ICON  = new ImageIcon(TrackMateWizard.class.getResource("images/page_save.png"));
     
     public static final String TRACK_ID = "TRACK_ID";
 	
@@ -95,7 +96,7 @@ public class ExportTracksToCSV extends AbstractTMAction {
 	}
 
 	@Override
-	public void execute(TrackMate trackmate) {
+	public void execute(TrackMate trackmate, SelectionModel selectionModel, DisplaySettings displaySettings, Frame parent) {
 		logger.log("Exporting tracks to CSV files.\n");
 		final long start = System.currentTimeMillis();
 		final Model model = trackmate.getModel();
@@ -218,7 +219,7 @@ public class ExportTracksToCSV extends AbstractTMAction {
 		}
 
 		@Override
-		public TrackMateAction create( final TrackMateGUIController controller )
+		public TrackMateAction create()
 		{
 			return new ExportTracksToCSV();
 		}
@@ -226,7 +227,7 @@ public class ExportTracksToCSV extends AbstractTMAction {
 		@Override
 		public ImageIcon getIcon()
 		{
-			return ICON;
+			return Icons.APPLY_ICON;
 		}
 	}
 

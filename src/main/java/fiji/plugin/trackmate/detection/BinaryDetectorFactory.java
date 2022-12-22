@@ -23,14 +23,16 @@ import org.scijava.plugin.Plugin;
 
 import fiji.plugin.trackmate.Model;
 import fiji.plugin.trackmate.Settings;
-import fiji.plugin.trackmate.gui.ConfigurationPanel;
-import fiji.plugin.trackmate.util.TMUtils;
+import fiji.plugin.trackmate.gui.components.ConfigurationPanel;
 import net.imagej.ImgPlus;
+import net.imagej.axis.Axes;
+import net.imagej.axis.AxisType;
 import net.imglib2.Interval;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.type.NativeType;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.view.Views;
+import net.imglib2.util.Util;
 
 @Plugin( type = SpotDetectorFactory.class )
 public class BinaryDetectorFactory<T extends RealType< T > & NativeType< T >> implements SpotDetectorFactory<T> {
@@ -201,9 +203,9 @@ public class BinaryDetectorFactory<T extends RealType< T > & NativeType< T >> im
 	
 	protected RandomAccessibleInterval< T > prepareFrameImg( final int frame )
 	{
-		final double[] calibration = TMUtils.getSpatialCalibration( img );
+		final double[] calibration = getSpatialCalibration( img );
 		RandomAccessibleInterval< T > imFrame;
-		final int cDim = TMUtils.findCAxisIndex( img );
+		final int cDim = findCAxisIndex( img );
 		if ( cDim < 0 )
 		{
 			imFrame = img;
@@ -215,7 +217,7 @@ public class BinaryDetectorFactory<T extends RealType< T > & NativeType< T >> im
 			imFrame = Views.hyperSlice( img, cDim, channel );
 		}
 
-		int timeDim = TMUtils.findTAxisIndex( img );
+		int timeDim = findTAxisIndex( img );
 		if ( timeDim >= 0 )
 		{
 			if ( cDim >= 0 && timeDim > cDim )
@@ -238,6 +240,45 @@ public class BinaryDetectorFactory<T extends RealType< T > & NativeType< T >> im
 		}
 
 		return imFrame;
+	}
+	
+	private double[] getSpatialCalibration(ImgPlus<T> img2) {
+		final double[] calibration = Util.getArrayFromValue( 1d, 3 );
+
+		for ( int d = 0; d < img.numDimensions(); d++ )
+		{
+			if ( img.axis( d ).type() == Axes.X )
+			{
+				calibration[ 0 ] = img.averageScale( d );
+			}
+			else if ( img.axis( d ).type() == Axes.Y )
+			{
+				calibration[ 1 ] = img.averageScale( d );
+			}
+			else if ( img.axis( d ).type() == Axes.Z )
+			{
+				calibration[ 2 ] = img.averageScale( d );
+			}
+		}
+		return calibration;
+	}
+
+	private int findAxisIndex(ImgPlus<T> img2, AxisType axis) {
+		return img.dimensionIndex( axis );
+	}
+
+	private int findTAxisIndex(ImgPlus<T> img2) {
+		return findAxisIndex( img, Axes.TIME );
+	}
+
+	private int findCAxisIndex(ImgPlus<T> img2) {
+		return findAxisIndex( img, Axes.CHANNEL );
+	}
+
+	@Override
+	public SpotDetectorFactoryBase<T> copy() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

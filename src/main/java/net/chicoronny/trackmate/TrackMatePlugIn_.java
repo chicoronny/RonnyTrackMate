@@ -1,25 +1,26 @@
 package net.chicoronny.trackmate;
 
+import javax.swing.JFrame;
+
 import fiji.plugin.trackmate.Model;
+import fiji.plugin.trackmate.SelectionModel;
 import fiji.plugin.trackmate.Settings;
 import fiji.plugin.trackmate.TrackMate;
 import fiji.plugin.trackmate.gui.GuiUtils;
-import fiji.plugin.trackmate.gui.TrackMateGUIController;
+import fiji.plugin.trackmate.gui.Icons;
+import fiji.plugin.trackmate.gui.displaysettings.DisplaySettings;
+import fiji.plugin.trackmate.gui.displaysettings.DisplaySettingsIO;
+import fiji.plugin.trackmate.gui.wizard.TrackMateWizardSequence;
+import fiji.plugin.trackmate.gui.wizard.WizardSequence;
 import ij.IJ;
 import ij.ImageJ;
 import ij.ImagePlus;
+import ij.Prefs;
 import ij.WindowManager;
 import ij.plugin.PlugIn;
 
 public class TrackMatePlugIn_ implements PlugIn
 {
-
-	protected TrackMate trackmate;
-
-	protected Settings settings;
-
-	protected Model model;
-
 	/**
 	 * Runs the TrackMate GUI plugin.
 	 *
@@ -59,19 +60,21 @@ public class TrackMatePlugIn_ implements PlugIn
 		}
 		GuiUtils.userCheckImpDimensions( imp );
 
-		settings = createSettings( imp );
-		model = createModel();
-		trackmate = createTrackMate();
+		final Settings settings = createSettings( imp );
+		final Model model = createModel();
+		final TrackMate trackmate = createTrackMate(model, settings);
+		final SelectionModel selectionModel = new SelectionModel( model );
+		final DisplaySettings displaySettings = DisplaySettingsIO.readUserDefault().copy( "CurrentDisplaySettings" );
 
 		/*
 		 * Launch GUI.
 		 */
-
-		final TrackMateGUIController controller = new TrackMateGUIController( trackmate );
-		if ( imp != null )
-		{
-			GuiUtils.positionWindow( controller.getGUI(), imp.getWindow() );
-		}
+		// Wizard.
+		final WizardSequence sequence = new TrackMateWizardSequence( trackmate, selectionModel, displaySettings );
+		final JFrame frame = sequence.run( "TrackMate on " + imp.getShortTitle() );
+		frame.setIconImage( Icons.TRACKMATE_ICON.getImage() );
+		GuiUtils.positionWindow( frame, imp.getWindow() );
+				frame.setVisible( true );		
 	}
 
 	/*
@@ -101,8 +104,7 @@ public class TrackMatePlugIn_ implements PlugIn
 	 */
 	protected Settings createSettings( final ImagePlus imp )
 	{
-		final Settings settings = new Settings();
-		settings.setFrom( imp );
+		final Settings settings = new Settings(imp);
 		return settings;
 	}
 
@@ -112,7 +114,7 @@ public class TrackMatePlugIn_ implements PlugIn
 	 *
 	 * @return a new {@link TrackMate} instance.
 	 */
-	protected TrackMate createTrackMate()
+	protected TrackMate createTrackMate( final Model model, final Settings settings )
 	{
 		/*
 		 * Since we are now sure that we will be working on this model with this
@@ -122,7 +124,12 @@ public class TrackMatePlugIn_ implements PlugIn
 		final String timeUnits = settings.imp.getCalibration().getTimeUnit();
 		model.setPhysicalUnits( spaceUnits, timeUnits );
 
-		return new TrackMate( model, settings );
+		final TrackMate trackmate = new TrackMate( model, settings );
+
+		// Set the num of threads from IJ prefs.
+		trackmate.setNumThreads( Prefs.getThreads() );
+
+		return trackmate;
 	}
 
 	/*
